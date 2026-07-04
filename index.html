@@ -168,7 +168,7 @@ function cardHTML(slug, i){
   const badge = type==="mobile" ? "移动端" : "PC";
   const url = BASE + slug + "/";
   const idx = String(i+1).padStart(2,'0');
-  return `<a class="card" href="${url}" data-key="${(slug+' '+title+' '+desc+' '+tags.join(' ')+' '+badge).toLowerCase()}">
+  return `<a class="card" href="${url}" target="_blank" rel="noopener" data-key="${(slug+' '+title+' '+desc+' '+tags.join(' ')+' '+badge).toLowerCase()}">
     <div class="shot">
       <div class="ph"><span>${(title[0]||slug[0]||'·').toUpperCase()}</span></div>
       <iframe data-src="${url}" data-vw="${vw}" loading="lazy" scrolling="no" title="${title} 预览"></iframe>
@@ -255,7 +255,4 @@ async function load(){
   render(slugs);
 }
 document.getElementById('yr').textContent = new Date().getFullYear();
-load();
-</script>
-</body>
-</html>
+loa
