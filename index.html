@@ -21,7 +21,6 @@ body{
   background:var(--bg);color:var(--ink);min-height:100vh;
   overflow-x:hidden;-webkit-font-smoothing:antialiased;
 }
-/* ambient aurora */
 .aurora{position:fixed;inset:0;z-index:0;pointer-events:none;filter:blur(80px);opacity:.55}
 .aurora span{position:absolute;border-radius:50%;mix-blend-mode:screen;animation:drift 22s ease-in-out infinite}
 .aurora .a{width:44vw;height:44vw;left:-8vw;top:-10vw;background:radial-gradient(circle,#6D5EF6,transparent 65%)}
@@ -31,7 +30,6 @@ body{
 
 .wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:56px 24px 80px}
 
-/* header */
 .top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:14px}
 .logo{width:46px;height:46px;border-radius:13px;position:relative;
@@ -47,13 +45,11 @@ body{
 .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--teal);margin-right:6px;box-shadow:0 0 8px var(--teal);vertical-align:middle;animation:pulse 2.4s infinite}
 @keyframes pulse{50%{opacity:.35}}
 
-/* hero */
 .hero{margin:44px 0 30px}
 .hero h2{font-family:"Space Grotesk";font-weight:700;font-size:clamp(34px,6vw,60px);line-height:1.02;letter-spacing:-1.5px}
 .hero h2 .g{background:linear-gradient(100deg,var(--violet),var(--teal) 55%,var(--rose));-webkit-background-clip:text;background-clip:text;color:transparent}
 .hero .sub{margin-top:16px;color:var(--muted);font-size:15.5px;max-width:520px;line-height:1.6}
 
-/* search */
 .search{margin:26px 0 8px;position:relative;max-width:460px}
 .search input{width:100%;background:var(--panel);border:1px solid var(--line);color:var(--ink);
   font-size:14.5px;font-family:inherit;padding:14px 16px 14px 44px;border-radius:14px;outline:none;transition:.2s}
@@ -62,7 +58,6 @@ body{
 .search svg{position:absolute;left:15px;top:50%;transform:translateY(-50%);width:17px;height:17px;stroke:var(--muted)}
 .search kbd{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-family:"JetBrains Mono";font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:2px 7px;background:var(--panel-2)}
 
-/* grid */
 .grid{margin-top:30px;display:grid;gap:22px;grid-template-columns:repeat(auto-fill,minmax(268px,1fr))}
 .card{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;
   text-decoration:none;color:inherit;display:flex;flex-direction:column;
@@ -138,21 +133,19 @@ footer a{color:var(--muted);text-decoration:none;border-bottom:1px dotted rgba(2
 
   <footer>
     <span>© <span id="yr"></span> nue-mic · GitHub Pages</span>
-    <span>由子目录自动生成 · <a href="https://github.com/nue-mic/pages" target="_blank" rel="noopener">仓库</a></span>
+    <span>点击卡片在新标签打开 · <a href="https://github.com/nue-mic/pages" target="_blank" rel="noopener">仓库</a></span>
   </footer>
 </div>
 
 <script>
-// ==== 项目元数据（可选）。有则用，没有的文件夹也会自动列出 ====
-// 新增项目只需 push 一个 <名字>/index.html 文件夹即可自动出现；
-// 想给它配标题/描述/标签/类型，就在这里加一条。type: "mobile" | "pc"
 const META = {
   "yq2": { title: "仪圈", desc: "移动端首页 · 新一波改动", tags: ["移动端","H5"], type: "mobile" }
 };
-const DEFAULT_TYPE = "pc";                 // 未标注的自动发现项目按 PC 缩略图显示
-const VW = { mobile: 390, pc: 1280 };      // 各类型的虚拟视口宽度
+const PROJECTS = ["yq2"];
+const DEFAULT_TYPE = "pc";
+const VW = { mobile: 390, pc: 1280 };
 const REPO = "nue-mic/pages";
-const BASE = "./"; // 相对当前索引页
+const BASE = "./";
 
 const grid = document.getElementById('grid');
 const qEl = document.getElementById('q');
@@ -165,7 +158,7 @@ function cardHTML(slug, i){
   const tags = m.tags || [];
   const type = m.type || DEFAULT_TYPE;
   const vw = VW[type] || VW.pc;
-  const badge = type==="mobile" ? "移动端" : "PC";
+  const badge = type === "mobile" ? "移动端" : "PC";
   const url = BASE + slug + "/";
   const idx = String(i+1).padStart(2,'0');
   return `<a class="card" href="${url}" target="_blank" rel="noopener" data-key="${(slug+' '+title+' '+desc+' '+tags.join(' ')+' '+badge).toLowerCase()}">
@@ -195,7 +188,6 @@ function render(slugs){
   setupPreviews();
 }
 
-// 实时预览：可见时才加载 iframe，并按卡片宽度缩放到手机屏
 function setupPreviews(){
   const io = new IntersectionObserver((es)=>{
     es.forEach(e=>{
@@ -218,7 +210,6 @@ function scaleAll(){
 }
 window.addEventListener('resize',scaleAll);
 
-// 搜索过滤
 qEl.addEventListener('input',()=>{
   const q = qEl.value.trim().toLowerCase();
   let shown = 0;
@@ -234,9 +225,6 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){ qEl.value=''; qEl.dispatchEvent(new Event('input')); qEl.blur(); }
 });
 
-// 已发布项目内置清单（发布时自动维护，保证被墙/离线也能正常显示）
-const PROJECTS = ["yq2"];
-
 function sortSlugs(slugs){
   const order = Object.keys(META);
   return slugs.slice().sort((a,b)=>{
@@ -246,7 +234,6 @@ function sortSlugs(slugs){
   });
 }
 
-// 立即用内置清单渲染；再尽力用 GitHub API 发现新增子目录（带超时，失败不影响）
 function load(){
   const base = (PROJECTS.length ? PROJECTS : Object.keys(META)).slice();
   render(sortSlugs(base));
@@ -256,4 +243,23 @@ async function discover(base){
   try{
     const ctrl = new AbortController();
     const t = setTimeout(()=>ctrl.abort(), 3500);
-    const r = await fetch(`https://api.github.com/repos/${R
+    const r = await fetch(`https://api.github.com/repos/${REPO}/contents/?ref=main`,
+      {headers:{'Accept':'application/vnd.github+json'},signal:ctrl.signal});
+    clearTimeout(t);
+    if(!r.ok) return;
+    const items = await r.json();
+    if(!Array.isArray(items)) return;
+    const found = items.filter(x=>x.type==='dir' && !x.name.startsWith('.')).map(x=>x.name);
+    const merged = Array.from(new Set([...base, ...found]));
+    if(merged.length !== base.length){
+      render(sortSlugs(merged));
+      qEl.dispatchEvent(new Event('input'));
+    }
+  }catch(e){}
+}
+
+document.getElementById('yr').textContent = new Date().getFullYear();
+load();
+</script>
+</body>
+</html>
