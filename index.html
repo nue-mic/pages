@@ -234,25 +234,26 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){ qEl.value=''; qEl.dispatchEvent(new Event('input')); qEl.blur(); }
 });
 
-// 自动发现仓库子目录；失败则回退到 META 里的键
-async function load(){
-  let slugs = [];
-  try{
-    const r = await fetch(`https://api.github.com/repos/${REPO}/contents/?ref=main`,{headers:{'Accept':'application/vnd.github+json'}});
-    if(r.ok){
-      const items = await r.json();
-      slugs = items.filter(x=>x.type==='dir' && !x.name.startsWith('.')).map(x=>x.name);
-    }
-  }catch(e){}
-  if(!slugs.length) slugs = Object.keys(META);
-  // META 里定义过的排前面，其余按字母序
+// 已发布项目内置清单（发布时自动维护，保证被墙/离线也能正常显示）
+const PROJECTS = ["yq2"];
+
+function sortSlugs(slugs){
   const order = Object.keys(META);
-  slugs.sort((a,b)=>{
+  return slugs.slice().sort((a,b)=>{
     const ia=order.indexOf(a), ib=order.indexOf(b);
     if(ia>-1||ib>-1) return (ia>-1?ia:99)-(ib>-1?ib:99);
     return a.localeCompare(b);
   });
-  render(slugs);
 }
-document.getElementById('yr').textContent = new Date().getFullYear();
-loa
+
+// 立即用内置清单渲染；再尽力用 GitHub API 发现新增子目录（带超时，失败不影响）
+function load(){
+  const base = (PROJECTS.length ? PROJECTS : Object.keys(META)).slice();
+  render(sortSlugs(base));
+  discover(base);
+}
+async function discover(base){
+  try{
+    const ctrl = new AbortController();
+    const t = setTimeout(()=>ctrl.abort(), 3500);
+    const r = await fetch(`https://api.github.com/repos/${R
