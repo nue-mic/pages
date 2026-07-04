@@ -1,0 +1,698 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>移动端首页</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:#2c2c2e;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:20px}
+.phone-frame{width:375px;height:812px;background:#F7F8FA;border-radius:40px;box-shadow:0 0 0 10px #1a1a1a,0 20px 50px rgba(0,0,0,.5);position:relative;overflow:hidden;display:flex;flex-direction:column}
+.notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:150px;height:30px;background:#1a1a1a;border-bottom-left-radius:16px;border-bottom-right-radius:16px;z-index:1000}
+.screen-content{flex:1;position:relative;overflow:hidden}
+
+.page-view{position:absolute;top:0;left:0;right:0;bottom:0;overflow-y:auto;display:none;-webkit-overflow-scrolling:touch;background:#F7F8FA}
+.page-view::-webkit-scrollbar{display:none}
+.page-view.active{display:block}
+
+.main-tabs{background:#fff;display:flex;justify-content:space-around;padding:40px 10px 10px;border-bottom:1px solid #F2F3F5;position:sticky;top:0;z-index:99}
+.main-tab{padding:10px 0;font-size:15px;color:#646A73;position:relative;cursor:pointer}
+.main-tab.active{color:#1F2329;font-weight:600;font-size:16px}
+.main-tab.active::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:20px;height:3px;background:#1F2329;border-radius:2px}
+
+.filter-bar{background:#fff;padding:10px 12px;display:flex;align-items:center;border-bottom:1px solid #F2F3F5;position:sticky;top:0;z-index:98}
+.filter-tags-wrap{display:flex;align-items:center;flex:1;overflow-x:auto;scrollbar-width:none}
+.filter-tags-wrap::-webkit-scrollbar{display:none}
+.filter-tag{font-size:13px;color:#646A73;white-space:nowrap;cursor:pointer;padding:4px 10px;margin-right:4px;border-radius:12px}
+.filter-tag.active{color:#1F2329;font-weight:600;background:#F2F3F5}
+.dynamic-tag{font-size:12px;color:#165DFF;background:#E8F3FF;padding:4px 10px;border-radius:12px;margin-right:4px;white-space:nowrap;display:none;align-items:center}
+.dynamic-tag.show{display:flex}
+.dynamic-tag .close-icon{margin-left:4px;font-size:10px;cursor:pointer;opacity:.6}
+.btn-more{font-size:13px;color:#646A73;cursor:pointer;white-space:nowrap;margin-left:auto;display:flex;align-items:center}
+.btn-more.active{color:#165DFF}
+.more-panel{background:#fff;padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.08);display:none;z-index:97;border-bottom:1px solid #F2F3F5}
+.more-panel.show{display:block}
+.more-tags-grid{display:flex;flex-wrap:wrap;gap:10px}
+.more-tag{font-size:12px;padding:6px 12px;background:#F7F8FA;color:#646A73;border-radius:14px;cursor:pointer}
+.more-tag.selected{background:#E8F3FF;color:#165DFF}
+
+.supply-list{padding:12px}
+.card{background:#fff;border-radius:8px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.02);position:relative;cursor:pointer}
+.card:active{background:#fafafa}
+.card-header{display:flex;align-items:center;margin-bottom:12px}
+.avatar{width:36px;height:36px;border-radius:50%;background:#E5E6EB;margin-right:10px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;font-weight:bold;overflow:hidden;flex-shrink:0}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.user-info{flex:1;min-width:0}
+.user-name-row{display:flex;align-items:center;margin-bottom:4px;flex-wrap:wrap}
+.user-name{font-size:15px;font-weight:600;color:#1F2329;margin-right:6px}
+.tag{font-size:10px;padding:2px 6px;border-radius:4px;margin-right:4px;border:1px solid #E5E6EB;color:#646A73;background:#F7F8FA}
+.tag.svip{background:#FFF7E8;color:#D46B08;border-color:#FFD591}
+.tag.free{background:#F6FFED;color:#52C41A;border-color:#B7EB8F}
+.tag.paid{background:#FFF7E8;color:#D46B08;border-color:#FFD591}
+.company-name{font-size:12px;color:#8F959E}
+.badge-top{position:absolute;top:16px;right:16px;background:#E8F3FF;color:#165DFF;font-size:11px;padding:2px 8px;border-radius:10px;font-weight:500}
+.card-title{font-size:16px;line-height:1.5;color:#1F2329;margin-bottom:16px;font-weight:500}
+.card-footer{display:flex;justify-content:space-between;align-items:center}
+.card-type-tag{font-size:12px;color:#646A73;background:#F2F3F5;padding:4px 8px;border-radius:4px}
+.view-count{font-size:12px;color:#8F959E;display:flex;align-items:center;gap:4px}
+.view-count svg{width:14px;height:14px;fill:#8F959E}
+
+.mall-container{background:#fff}
+.search-bar{padding:10px 12px;display:flex;align-items:center;background:#fff;border-bottom:1px solid #F2F3F5}
+.search-input-wrap{flex:1;background:#F2F3F5;border-radius:20px;padding:8px 14px;font-size:13px;color:#8F959E;display:flex;align-items:center;gap:6px}
+.search-input-wrap input{border:none;background:transparent;flex:1;outline:none;font-size:13px;color:#1F2329}
+.search-btn{background:#FF4D4F;color:#fff;padding:7px 18px;border-radius:18px;font-size:13px;margin-left:10px;font-weight:500;cursor:pointer;border:none}
+.king-kong{display:flex;justify-content:space-around;padding:15px 0 10px;background:#fff}
+.kk-item{display:flex;flex-direction:column;align-items:center;font-size:12px;color:#1F2329}
+.kk-icon{margin-bottom:6px}
+.kk-icon svg{width:32px;height:32px}
+.carousel-container{margin:10px 12px;height:120px;border-radius:12px;overflow:hidden;position:relative}
+.carousel-track{display:flex;height:100%;transition:transform .5s ease}
+.carousel-slide{min-width:100%;height:100%}
+.carousel-slide img{width:100%;height:100%;object-fit:cover}
+.carousel-dots{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:6px}
+.dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.5)}
+.dot.active{background:#fff;width:12px;border-radius:3px}
+.mall-tabs{display:flex;padding:12px;gap:20px;border-bottom:1px solid #F2F3F5;background:#fff;position:sticky;top:0;z-index:90}
+.mall-tab{font-size:15px;color:#646A73;white-space:nowrap;position:relative;cursor:pointer}
+.mall-tab.active{color:#1F2329;font-weight:600}
+.mall-tab.active::after{content:'';position:absolute;bottom:-12px;left:50%;transform:translateX(-50%);width:20px;height:3px;background:#1F2329;border-radius:2px}
+.mall-grid{display:flex;padding:10px;gap:10px;background:#F7F8FA}
+.col{flex:1;display:flex;flex-direction:column;gap:10px}
+.product-card{background:#fff;border-radius:8px;overflow:hidden}
+.prod-img-wrap{position:relative;width:100%;height:140px;background:#eee}
+.prod-img{width:100%;height:100%;object-fit:cover}
+.hot-badge{position:absolute;top:0;left:0;background:linear-gradient(90deg,#FF4D4F,#FF7875);color:#fff;font-size:10px;padding:4px 8px;border-bottom-right-radius:8px;display:flex;align-items:center;gap:2px}
+.prod-info{padding:10px}
+.prod-title{font-size:13px;color:#1F2329;margin-bottom:8px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;height:36px}
+.prod-price-row{display:flex;align-items:baseline;gap:6px;margin-bottom:4px}
+.prod-price{color:#FF4D4F;font-size:16px;font-weight:bold}
+.prod-price span{font-size:11px}
+.prod-original-price{color:#BFBFBF;font-size:11px;text-decoration:line-through}
+.prod-sales{font-size:11px;color:#8F959E}
+
+.search-page{background:#F7F8FA;min-height:100%}
+.search-page-header{background:#fff;padding:44px 12px 10px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #F2F3F5;position:sticky;top:0;z-index:99}
+.back-btn{font-size:20px;cursor:pointer;color:#1F2329;padding:4px}
+.search-page-input{flex:1;background:#F2F3F5;border-radius:20px;padding:8px 14px;display:flex;align-items:center;gap:6px}
+.search-page-input input{border:none;background:transparent;flex:1;outline:none;font-size:13px}
+.search-page-btn{font-size:15px;font-weight:600;color:#1F2329;cursor:pointer}
+.search-tabs{display:flex;padding:12px;gap:20px;border-bottom:1px solid #F2F3F5;background:#fff;position:sticky;top:0;z-index:90}
+.search-tab{font-size:15px;color:#646A73;cursor:pointer;position:relative}
+.search-tab.active{color:#FF4D4F;font-weight:600}
+.search-tab.active::after{content:'';position:absolute;bottom:-12px;left:50%;transform:translateX(-50%);width:20px;height:3px;background:#FF4D4F;border-radius:2px}
+.search-result-wrap{padding:10px;background:#F7F8FA}
+
+/* 详情页 - 多层sticky固定布局 */
+.detail-page{background:#fff;display:flex;flex-direction:column;min-height:100%}
+.detail-header{background:#fff;padding:44px 16px 12px;display:flex;align-items:center;border-bottom:1px solid #F2F3F5;position:sticky;top:0;z-index:99;flex-shrink:0}
+.detail-title-bar{flex:1;text-align:center;font-size:16px;font-weight:600;color:#1F2329}
+
+/* 固定信息区 */
+.detail-info-fixed{background:#fff;position:sticky;top:0;z-index:98;flex-shrink:0;border-bottom:1px solid #F2F3F5}
+.detail-main-title{font-size:18px;font-weight:600;color:#1F2329;line-height:1.5;padding:16px 16px 10px}
+.detail-meta{display:flex;justify-content:space-between;font-size:12px;color:#8F959E;padding:0 16px 12px}
+.detail-user-card{display:flex;align-items:center;padding:12px 16px;background:#F7F8FA;margin:0 16px 12px;border-radius:8px}
+.detail-user-info{flex:1;margin-left:10px}
+.detail-user-name{font-size:14px;font-weight:600;color:#1F2329;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.detail-user-company{font-size:12px;color:#8F959E;margin-top:2px}
+.detail-location{display:flex;justify-content:space-between;font-size:12px;color:#8F959E;padding:0 16px 16px}
+
+/* 可滚动内容区 */
+.detail-scroll-content{flex:1;overflow-y:auto;padding:0 16px 20px;-webkit-overflow-scrolling:touch}
+.detail-scroll-content::-webkit-scrollbar{display:none}
+.detail-section-title{font-size:15px;font-weight:600;color:#1F2329;margin-bottom:12px;text-align:center;position:relative}
+.detail-section-title::before,.detail-section-title::after{content:'';position:absolute;top:50%;width:30px;height:1px;background:#E5E6EB}
+.detail-section-title::before{left:20%}
+.detail-section-title::after{right:20%}
+.detail-text{font-size:14px;color:#4E5969;line-height:1.8;margin-bottom:16px}
+.detail-text h4{font-size:14px;font-weight:600;color:#1F2329;margin:12px 0 6px}
+.detail-images{display:flex;gap:8px;margin-bottom:20px;overflow-x:auto}
+.detail-images img{width:100px;height:100px;object-fit:cover;border-radius:6px;flex-shrink:0}
+.detail-rating{display:flex;justify-content:space-between;align-items:center;padding:12px;background:#F7F8FA;border-radius:8px;margin-bottom:16px;cursor:pointer}
+.detail-rating-left{font-size:13px;color:#646A73;display:flex;align-items:center;gap:4px}
+.detail-rating-left svg{width:16px;height:16px;fill:#BFBFBF}
+.detail-rating-right{font-size:13px;color:#1F2329}
+.detail-stats{display:flex;justify-content:space-around;padding:16px 0;border-top:1px solid #F2F3F5;border-bottom:1px solid #F2F3F5;margin-bottom:16px}
+.detail-stat-item{text-align:center}
+.detail-stat-num{font-size:18px;font-weight:600;color:#1F2329}
+.detail-stat-label{font-size:12px;color:#8F959E;margin-top:4px}
+.detail-tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.detail-tag{font-size:12px;color:#165DFF;background:#E8F3FF;padding:4px 12px;border-radius:12px;border:1px solid #ADC6FF}
+.detail-dynamic-title{font-size:14px;font-weight:600;color:#1F2329;margin-bottom:12px}
+.detail-dynamic-item{display:flex;align-items:flex-start;padding:10px 0;border-bottom:1px solid #F2F3F5}
+.detail-dynamic-avatar{width:28px;height:28px;border-radius:50%;background:#E5E6EB;margin-right:10px;flex-shrink:0;overflow:hidden}
+.detail-dynamic-avatar img{width:100%;height:100%;object-fit:cover}
+.detail-dynamic-content{flex:1}
+.detail-dynamic-user{font-size:13px;color:#1F2329;margin-bottom:4px}
+.detail-dynamic-text{font-size:12px;color:#646A73}
+.detail-dynamic-time{font-size:11px;color:#BFBFBF;flex-shrink:0}
+.detail-more-dynamic{text-align:center;padding:12px;font-size:13px;color:#165DFF;cursor:pointer}
+.detail-safety{background:#FFF7E8;padding:12px;border-radius:8px;margin-bottom:20px}
+.detail-safety-title{font-size:13px;font-weight:600;color:#D46B08;margin-bottom:6px}
+.detail-safety-text{font-size:11px;color:#8F959E;line-height:1.6}
+.detail-safety-text a{color:#165DFF}
+
+/* 底部固定按钮栏 */
+.detail-bottom-bar{background:#fff;padding:10px 16px;display:flex;align-items:center;gap:12px;border-top:1px solid #F2F3F5;position:sticky;bottom:0;z-index:99;flex-shrink:0}
+.detail-bottom-icon{display:flex;flex-direction:column;align-items:center;font-size:10px;color:#646A73;cursor:pointer;min-width:40px}
+.detail-bottom-icon svg{width:22px;height:22px;fill:#646A73;margin-bottom:2px}
+.detail-bottom-btn{flex:1;background:#165DFF;color:#fff;border:none;padding:12px;border-radius:24px;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap}
+
+.rating-page{background:#F7F8FA}
+.rating-header{background:#fff;padding:44px 16px 12px;display:flex;align-items:center;border-bottom:1px solid #F2F3F5;position:sticky;top:0;z-index:99}
+.rating-title{flex:1;text-align:center;font-size:16px;font-weight:600;color:#1F2329}
+.rating-body{padding:20px 16px}
+.rating-subtitle{text-align:center;font-size:14px;color:#1F2329;margin-bottom:20px}
+.stars-container{display:flex;justify-content:center;gap:20px;padding:20px;background:#fff;border-radius:12px;margin-bottom:20px}
+.star{font-size:32px;cursor:pointer;color:#D9D9D9;transition:color .2s}
+.star.filled{color:#FAAD14}
+.rating-tags-section{margin-bottom:20px}
+.rating-tags-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.rating-tag{padding:12px 8px;border-radius:8px;font-size:13px;text-align:center;cursor:pointer;transition:all .2s;border:2px solid transparent}
+.rating-tag.positive{background:#F0F0F0;color:#1F2329}
+.rating-tag.negative{background:#F5F0F0;color:#8F959E}
+.rating-tag.selected{border-color:#165DFF;background:#E8F3FF;color:#165DFF}
+.anonymity-row{display:flex;align-items:center;gap:8px;padding:16px 0;margin-bottom:20px}
+.anonymity-checkbox{width:20px;height:20px;border:2px solid #D9D9D9;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.anonymity-checkbox.checked{background:#165DFF;border-color:#165DFF}
+.anonymity-checkbox.checked::after{content:'✓';color:#fff;font-size:12px;font-weight:bold}
+.anonymity-label{font-size:14px;color:#1F2329}
+.anonymity-label span{font-size:12px;color:#8F959E}
+.rating-submit-btn{width:100%;padding:14px;background:#165DFF;color:#fff;border:none;border-radius:24px;font-size:16px;font-weight:600;cursor:pointer}
+
+.placeholder-page{display:flex;align-items:center;justify-content:center;height:60vh;color:#999;font-size:14px}
+</style>
+</head>
+<body>
+<div class="phone-frame">
+<div class="notch"></div>
+<div class="screen-content">
+
+<div class="page-view active" id="page-home">
+<div class="main-tabs" id="mainTabs">
+<div class="main-tab" data-target="dynamic">动态</div>
+<div class="main-tab" data-target="ask">问一问</div>
+<div class="main-tab" data-target="article">文章</div>
+<div class="main-tab" data-target="mall">商城</div>
+<div class="main-tab active" data-target="supply">供需</div>
+</div>
+<div class="filter-bar" id="filterBar">
+<div class="filter-tags-wrap" id="filterTagsWrap">
+<div class="filter-tag active" data-filter="all">全部</div>
+<div class="filter-tag" data-filter="project">项目</div>
+<div class="filter-tag" data-filter="recruit">招聘</div>
+<div class="filter-tag" data-filter="job">求职</div>
+<div class="filter-tag" data-filter="coop">合作</div>
+<div class="dynamic-tag" id="dynamicTag"><span id="dynamicTagText"></span><span class="close-icon" id="closeDynamicTag">✕</span></div>
+<div class="btn-more" id="btnMore">更多 ▾</div>
+</div>
+</div>
+<div class="more-panel" id="morePanel">
+<div class="more-tags-grid">
+<div class="more-tag" data-filter="sub-brand">品牌货源</div>
+<div class="more-tag" data-filter="sub-venue">场地活动</div>
+<div class="more-tag" data-filter="sub-other">其他供需</div>
+</div>
+</div>
+<div id="homeContent"></div>
+</div>
+
+<div class="page-view" id="page-detail">
+<div class="detail-page">
+<div class="detail-header">
+<div class="back-btn" id="detailBackBtn">←</div>
+<div class="detail-title-bar">资源详情</div>
+<div style="width:20px"></div>
+</div>
+<div class="detail-info-fixed" id="detailInfoFixed"></div>
+<div class="detail-scroll-content" id="detailScrollContent"></div>
+<div class="detail-bottom-bar" id="detailBottomBar"></div>
+</div>
+</div>
+
+<div class="page-view" id="page-rating">
+<div class="rating-page">
+<div class="rating-header">
+<div class="back-btn" id="ratingBackBtn">←</div>
+<div class="rating-title">资源评分</div>
+<div style="width:20px"></div>
+</div>
+<div class="rating-body" id="ratingBody"></div>
+</div>
+</div>
+
+<div class="page-view" id="page-search">
+<div class="search-page">
+<div class="search-page-header">
+<div class="back-btn" id="searchBackBtn">←</div>
+<div class="search-page-input">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="#8F959E"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+<input type="text" id="searchPageInput" placeholder="搜索商品...">
+</div>
+<div class="search-page-btn" id="searchPageBtn">搜索</div>
+</div>
+<div class="search-tabs" id="searchTabs">
+<div class="search-tab active" data-search-filter="all">综合</div>
+<div class="search-tab" data-search-filter="virtual">虚拟商品</div>
+<div class="search-tab" data-search-filter="resource">资源文件</div>
+<div class="search-tab" data-search-filter="course">视频课程</div>
+</div>
+<div class="search-result-wrap" id="searchResultWrap"></div>
+</div>
+</div>
+
+</div>
+</div>
+
+<script>
+const productImages={
+resource:'https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=300&h=200&fit=crop',
+course:'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=300&h=200&fit=crop',
+virtual:'https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=300&h=200&fit=crop'
+};
+const bannerImages=[
+'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=400&h=200&fit=crop',
+'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=200&fit=crop',
+'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=400&h=200&fit=crop'
+];
+const avatarPlaceholder='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80&h=80&fit=crop&crop=face';
+
+const eyeSVG='<svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>';
+
+const supplyData=[
+{id:1,user:"薛女士",company:"天津鲸鱼轻创",title:"全国线路旅游卡-纯玩游-自驾游-源头渠道独立后台-无加盟费",type:"项目",category:"project",sub:"brand",views:"6.4w+",top:true,avatarColor:"#667eea",free:true},
+{id:2,user:"杜先生",company:"上海冷新科技",title:"羚羊推客，官签项目，一手价格，招募地推团队和网推渠道",type:"招聘",category:"recruit",sub:"venue",views:"21.7w+",top:true,avatarColor:"#9b59b6",svip:true,free:false},
+{id:3,user:"张先生",company:"",title:"88折话费加油抵扣卡、免费旅游卡源头对接！终身管道收益!",type:"合作",category:"coop",sub:"brand",views:"16.2w+",top:true,avatarColor:"#34495e",svip:true,free:true},
+{id:4,user:"赵攀",company:"四川鱼游千里",title:"鱼游推客，官签项目，一手价格，招募地推团队和网推渠道",type:"项目",category:"project",sub:"other",views:"3.8w+",top:true,avatarColor:"#e67e22",free:false},
+{id:5,user:"黄先生",company:"",title:"美团蔬菜水果闪购1000一家项目方",type:"项目",category:"project",sub:"venue",views:"1.2w+",top:true,avatarColor:"#2c3e50",free:true},
+{id:6,user:"李经理",company:"杭州推广大本营",title:"APP拉新注册，单价50-200元，日结，寻求全国团队长合作",type:"招聘",category:"recruit",sub:"brand",views:"5.5w+",top:false,avatarColor:"#1abc9c",free:false},
+{id:7,user:"王总监",company:"北京互娱网络",title:"游戏推广员招募，高提成，在家可做，适合大学生兼职",type:"招聘",category:"recruit",sub:"other",views:"8.9w+",top:false,avatarColor:"#3498db",free:true},
+{id:8,user:"陈老板",company:"深圳电子厂",title:"急招普工100名，包吃住，月入8000，入职发被子",type:"招聘",category:"recruit",sub:"venue",views:"3.2w+",top:false,avatarColor:"#95a5a6",free:false},
+{id:9,user:"刘设计师",company:"自由职业",title:"承接UI设计、海报设计、Logo设计，价格公道，出图快",type:"求职",category:"job",sub:"other",views:"1.1w+",top:false,avatarColor:"#8e44ad",free:true},
+{id:10,user:"张开发",company:"全栈工程师",title:"接小程序开发、网站开发、APP外包，5年经验，代码规范",type:"求职",category:"job",sub:"brand",views:"2.4w+",top:false,avatarColor:"#2980b9",free:false},
+{id:11,user:"吴总",company:"广州供应链",title:"寻找全国社区团购团长合作，提供一手货源，利润空间大",type:"合作",category:"coop",sub:"brand",views:"4.5w+",top:false,avatarColor:"#d35400",free:true},
+{id:12,user:"郑同学",company:"",title:"出售闲置地推物料，展架、传单模板，低价处理",type:"其他",category:"other",sub:"other",views:"0.5w+",top:false,avatarColor:"#7f8c8d",free:false}
+];
+
+const mallData=[
+{id:1,title:"【热门】地推实战宝典 2024最新版",price:29.9,originalPrice:99,sales:"已售1.2万",category:"resource",isHot:true,views:"3.5w人浏览"},
+{id:2,title:"短视频剪辑全套教程 从入门到精通",price:199,originalPrice:399,sales:"已售856",category:"course",isHot:false,views:""},
+{id:3,title:"自动获客软件 安卓/iOS双端",price:50,originalPrice:100,sales:"已售342",category:"virtual",isHot:true,views:"1.2w人浏览"},
+{id:4,title:"1000套精美PPT模板 商务风",price:9.9,originalPrice:29.9,sales:"已售5000+",category:"resource",isHot:false,views:""},
+{id:5,title:"直播带货话术大全 电子版",price:15,originalPrice:50,sales:"已售2100",category:"resource",isHot:true,views:"8900人浏览"},
+{id:6,title:"Python爬虫课程 零基础入门",price:128,originalPrice:299,sales:"已售430",category:"course",isHot:false,views:""}
+];
+
+const positiveTags=["反馈及时","有效信息","实际相符","需求明确","优质资源","服务不错","态度友好","免费资源","达成合作","免费项目","真实资源","一手资源","源头渠道","合作愉快","资源合适","服务耐心"];
+const negativeTags=["联系不上","内容夸大","事实不符","描述不详","资源一般","低效服务","态度敷衍","冒充免费","谨慎合作","收费项目","内容不实","中介资源","渠道一般","合作一般","内容不适","服务一般"];
+
+let currentMainFilter='all',currentSubFilter=null,currentDetailId=null;
+let ratingStars=1,ratingSelectedTags=[],ratingAnonymous=false;
+
+function showPage(id){
+document.querySelectorAll('.page-view').forEach(p=>p.classList.remove('active'));
+document.getElementById('page-'+id).classList.add('active');
+}
+
+function renderHomeContent(target){
+const home=document.getElementById('homeContent');
+const filterBar=document.getElementById('filterBar');
+if(target==='supply'){
+filterBar.style.display='flex';
+home.innerHTML='<div class="supply-list" id="supplyListContainer"></div>';
+renderSupplyList();
+}else if(target==='mall'){
+filterBar.style.display='none';
+home.innerHTML=`<div class="mall-container">
+<div class="search-bar">
+<div class="search-input-wrap">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="#8F959E"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+<input type="text" id="mallSearchInput" placeholder="搜索商品...">
+</div>
+<button class="search-btn" id="mallSearchBtn">搜索</button>
+</div>
+<div class="king-kong">
+<div class="kk-item"><div class="kk-icon"><svg viewBox="0 0 48 48" fill="none"><rect x="8" y="12" width="32" height="28" rx="4" fill="#F0E6FF" stroke="#7B61FF" stroke-width="2"/><path d="M16 12V10a8 8 0 0116 0v2" stroke="#7B61FF" stroke-width="2" stroke-linecap="round"/><path d="M20 22c0 2.21 1.79 4 4 4s4-1.79 4-4" stroke="#7B61FF" stroke-width="2" stroke-linecap="round"/></svg></div>我的橱窗</div>
+<div class="kk-item"><div class="kk-icon"><svg viewBox="0 0 48 48" fill="none"><path d="M6 10h4l3 18h22l3-12H14" stroke="#FF7A45" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="16" cy="34" r="3" fill="#FF7A45"/><circle cx="30" cy="34" r="3" fill="#FF7A45"/></svg></div>购物车</div>
+<div class="kk-item"><div class="kk-icon"><svg viewBox="0 0 48 48" fill="none"><rect x="10" y="6" width="28" height="36" rx="3" fill="#E6F4FF" stroke="#4096FF" stroke-width="2"/><path d="M16 14h16M16 22h16M16 30h10" stroke="#4096FF" stroke-width="2" stroke-linecap="round"/></svg></div>我买到的</div>
+<div class="kk-item"><div class="kk-icon"><svg viewBox="0 0 48 48" fill="none"><path d="M6 24h6l4-10 6 20 6-14 4 4h10" stroke="#36CFC9" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>我卖出的</div>
+</div>
+<div class="carousel-container">
+<div class="carousel-track" id="carouselTrack">
+${bannerImages.map(img=>`<div class="carousel-slide"><img src="${img}"></div>`).join('')}
+</div>
+<div class="carousel-dots" id="carouselDots"><div class="dot active"></div><div class="dot"></div><div class="dot"></div></div>
+</div>
+<div class="mall-tabs" id="mallTabs">
+<div class="mall-tab active" data-mall-filter="all">推荐</div>
+<div class="mall-tab" data-mall-filter="virtual">虚拟商品</div>
+<div class="mall-tab" data-mall-filter="resource">资源文件</div>
+<div class="mall-tab" data-mall-filter="course">视频课程</div>
+</div>
+<div class="mall-grid" id="mallGrid"></div>
+</div>`;
+renderMallList('all');
+bindMallEvents();
+}else{
+filterBar.style.display='none';
+home.innerHTML='<div class="placeholder-page">'+({dynamic:'动态内容',ask:'问一问内容',article:'文章内容'}[target]||'')+'</div>';
+}
+}
+
+function renderSupplyList(){
+const container=document.getElementById('supplyListContainer');
+if(!container)return;
+container.innerHTML='';
+const filtered=supplyData.filter(item=>{
+if(currentSubFilter)return item.sub===currentSubFilter.replace('sub-','');
+if(currentMainFilter==='all')return true;
+return item.category===currentMainFilter;
+});
+if(filtered.length===0){container.innerHTML='<div style="text-align:center;padding:40px;color:#999">暂无相关内容</div>';return}
+filtered.forEach(item=>{
+const svip=item.svip?'<span class="tag svip">SVIP</span>':'';
+const company=item.company?`<div class="company-name">${item.company}</div>`:'';
+const top=item.top?'<div class="badge-top">置顶</div>':'';
+const freeTag=item.free?'<span class="tag free">免费</span>':'<span class="tag paid">付费</span>';
+container.innerHTML+=`<div class="card" data-id="${item.id}">
+${top}
+<div class="card-header">
+<div class="avatar" style="background:${item.avatarColor}">${item.user[0]}</div>
+<div class="user-info">
+<div class="user-name-row"><span class="user-name">${item.user}</span>${svip}<span class="tag">实名</span></div>
+${company}
+</div>
+</div>
+<div class="card-title">${item.title}</div>
+<div class="card-footer">
+<div><span class="card-type-tag">${item.type}</span>${freeTag}</div>
+<span class="view-count">${eyeSVG} ${item.views}</span>
+</div>
+</div>`;
+});
+container.querySelectorAll('.card').forEach(card=>{
+card.addEventListener('click',function(){showDetail(parseInt(this.getAttribute('data-id')))});
+});
+}
+
+function renderMallList(filter,containerId){
+const grid=document.getElementById(containerId||'mallGrid');
+if(!grid)return;
+grid.innerHTML='<div class="col" id="cl-'+containerId+'"></div><div class="col" id="cr-'+containerId+'"></div>';
+const cl=document.getElementById('cl-'+containerId),cr=document.getElementById('cr-'+containerId);
+const filtered=filter==='all'?mallData:mallData.filter(i=>i.category===filter);
+if(filtered.length===0){grid.innerHTML='<div style="width:100%;text-align:center;padding:40px;color:#999">暂无商品</div>';return}
+filtered.forEach((item,idx)=>{
+const hot=item.isHot?`<div class="hot-badge">🔥${item.views}</div>`:'';
+const img=productImages[item.category]||productImages.resource;
+const html=`<div class="product-card">
+<div class="prod-img-wrap">${hot}<img src="${img}" class="prod-img"></div>
+<div class="prod-info">
+<div class="prod-title">${item.title}</div>
+<div class="prod-price-row"><div class="prod-price"><span>¥</span>${item.price}</div><div class="prod-original-price">¥${item.originalPrice}</div></div>
+<div class="prod-sales">${item.sales}</div>
+</div></div>`;
+(idx%2===0?cl:cr).innerHTML+=html;
+});
+}
+
+function showDetail(id){
+const item=supplyData.find(d=>d.id===id);
+if(!item)return;
+currentDetailId=id;
+
+// 固定信息区：标题、日期、用户卡片（带全部标签）、定位
+const svipTag=item.svip?'<span class="tag svip">SVIP</span>':'';
+const infoFixed=document.getElementById('detailInfoFixed');
+infoFixed.innerHTML=`
+<div class="detail-main-title">【找合伙人】源头一手渠道3000+任务，均价35以上，可工作室网推，独立后台有保障</div>
+<div class="detail-meta"><span>2023-06-02 10:23:56</span><span>浏览量：82699</span></div>
+<div class="detail-user-card">
+<div class="avatar" style="background:${item.avatarColor};width:40px;height:40px;font-size:14px">${item.user[0]}</div>
+<div class="detail-user-info">
+<div class="detail-user-name">${item.user} · 项目总监 ${svipTag}<span class="tag">实名</span></div>
+<div class="detail-user-company">${item.company||'个人'} ✔</div>
+</div>
+<svg width="16" height="16" viewBox="0 0 24 24" fill="#BFBFBF"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+</div>
+<div class="detail-location">
+<span>📍 定位：全国</span><span>IT/互联网/娱乐/休闲/媒体</span>
+</div>`;
+
+// 可滚动内容区
+const scrollContent=document.getElementById('detailScrollContent');
+scrollContent.innerHTML=`
+<div class="detail-section-title">合作概述</div>
+<div class="detail-text">
+<h4>II我需要的资源：</h4>
+<p>1.想创业或想转型的老板，对CPA工作室拉新项目有兴趣并认可此行业；</p>
+<p>2.有强烈的创业想法，想赚钱，有耐心，在当地有人力资源或大学生资源更佳；</p>
+<p>3.开一个工作室或做网推，招人员，线上做单也可，只要能招到人，就能挣钱。</p>
+<h4>II我提供的资源：</h4>
+<h4>1.项目名称</h4>
+<p>APP拉新风口项目，合伙人以开工作室、网推或地推方式招人员，招的人员越多产值越高</p>
+<h4>2.项目介绍</h4>
+<p>①APP拉新渠道源头，三年老平台，公司拥有1000多款官方一手渠道的拉新项目可供选择；</p>
+<p>长期稳定的一手渠道资源，高佣金，任务全面；</p>
+<p>③靠谱完善的财务结算系统，当天任务当天结算提现，T+0当天结算不抽佣；</p>
+<p>④真实，平台稳定结算及时有保障。</p>
+<h4>3.收益利润</h4>
+<p>一手渠道不抽佣，当天结算，单人一天产值在500~1000</p>
+<h4>4.费用说明</h4>
+<p>低门槛合作项目，按照合同要求完成任务可以退还，门槛低，利润高。</p>
+<h4>5.扶持培训</h4>
+<p>所有合作客户，建立服务群，多对一服务，协助系统搭建，运营，维护，培训。提供人力资源渠道，网推搭建等，总部全程扶持及售后服务。</p>
+</div>
+<div class="detail-section-title">资源图片</div>
+<div class="detail-images">
+<img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=200&h=200&fit=crop">
+<img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=200&h=200&fit=crop">
+<img src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=200&h=200&fit=crop">
+</div>
+<div class="detail-rating" id="ratingEntry">
+<div class="detail-rating-left">
+点此进行资源评分
+<svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+<svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+<svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+<svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+<svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+</div>
+<div class="detail-rating-right">评分：5.0分</div>
+</div>
+<div class="detail-stats">
+<div class="detail-stat-item"><div class="detail-stat-num">68822</div><div class="detail-stat-label">访客</div></div>
+<div class="detail-stat-item"><div class="detail-stat-num">7361</div><div class="detail-stat-label">联系人</div></div>
+<div class="detail-stat-item"><div class="detail-stat-num">1057</div><div class="detail-stat-label">点赞</div></div>
+</div>
+<div class="detail-tags">
+<span class="detail-tag">一手资源 1</span><span class="detail-tag">合作愉快 1</span><span class="detail-tag">实际相符 1</span>
+<span class="detail-tag">有效信息 1</span><span class="detail-tag">服务耐心 1</span><span class="detail-tag">真实资源 1</span>
+</div>
+<div class="detail-dynamic-title">帖子动态：</div>
+<div class="detail-dynamic-item">
+<div class="detail-dynamic-avatar"><img src="${avatarPlaceholder}"></div>
+<div class="detail-dynamic-content"><div class="detail-dynamic-user">用户_6g7h***A</div><div class="detail-dynamic-text">已联系</div></div>
+<div class="detail-dynamic-time">3小时前</div>
+</div>
+<div class="detail-dynamic-item">
+<div class="detail-dynamic-avatar"><img src="${avatarPlaceholder}"></div>
+<div class="detail-dynamic-content"><div class="detail-dynamic-user">用户_JcHc***I</div><div class="detail-dynamic-text">已联系</div></div>
+<div class="detail-dynamic-time">14小时前</div>
+</div>
+<div class="detail-dynamic-item">
+<div class="detail-dynamic-avatar"><img src="${avatarPlaceholder}"></div>
+<div class="detail-dynamic-content"><div class="detail-dynamic-user">用户_7ejk***y</div><div class="detail-dynamic-text">已联系</div></div>
+<div class="detail-dynamic-time">18小时前</div>
+</div>
+<div class="detail-more-dynamic">查看更多动态</div>
+<div class="detail-safety">
+<div class="detail-safety-title">安全提示：</div>
+<div class="detail-safety-text">投资有风险，合作需谨慎。沟通联系平台资源时，还请理智判断，慎重考虑。建议合作前充分了解对方并签署协议。<a href="#">了解更多安全防范知识</a></div>
+</div>`;
+
+// 底部按钮栏
+const btnText=item.free?'免费 联系对方':'支付 50仪豆 联系对方';
+document.getElementById('detailBottomBar').innerHTML=`
+<div class="detail-bottom-icon" id="btnReport">
+<svg viewBox="0 0 24 24"><path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6z"/></svg>
+举报
+</div>
+<div class="detail-bottom-icon" id="btnShare">
+<svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>
+分享
+</div>
+<div class="detail-bottom-icon" id="btnLike">
+<svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+点赞
+</div>
+<button class="detail-bottom-btn">${btnText}</button>`;
+
+showPage('detail');
+document.getElementById('page-detail').scrollTop=0;
+}
+
+function showRating(){
+ratingStars=1;ratingSelectedTags=[];ratingAnonymous=false;
+const body=document.getElementById('ratingBody');
+body.innerHTML=`
+<div class="rating-subtitle">对该资源帖子进行评分</div>
+<div class="stars-container" id="starsContainer">
+${[1,2,3,4,5].map(i=>`<span class="star ${i<=1?'filled':''}" data-star="${i}">★</span>`).join('')}
+</div>
+<div class="rating-tags-section">
+<div class="rating-tags-grid" id="positiveTags">
+${positiveTags.map(t=>`<div class="rating-tag positive" data-tag="${t}">${t}</div>`).join('')}
+</div>
+</div>
+<div class="rating-tags-section">
+<div class="rating-tags-grid" id="negativeTags">
+${negativeTags.map(t=>`<div class="rating-tag negative" data-tag="${t}">${t}</div>`).join('')}
+</div>
+</div>
+<div class="anonymity-row">
+<div class="anonymity-checkbox" id="anonymityCheck"></div>
+<div class="anonymity-label">匿名 <span>匿名评分会隐藏头像和昵称</span></div>
+</div>
+<button class="rating-submit-btn" id="ratingSubmitBtn">提交</button>`;
+
+body.querySelectorAll('.star').forEach(s=>{
+s.addEventListener('click',function(){
+ratingStars=parseInt(this.getAttribute('data-star'));
+body.querySelectorAll('.star').forEach((st,i)=>st.classList.toggle('filled',i<ratingStars));
+});
+});
+body.querySelectorAll('.rating-tag').forEach(t=>{
+t.addEventListener('click',function(){
+const tag=this.getAttribute('data-tag');
+if(ratingSelectedTags.includes(tag)){
+ratingSelectedTags=ratingSelectedTags.filter(x=>x!==tag);
+this.classList.remove('selected');
+}else{
+ratingSelectedTags.push(tag);
+this.classList.add('selected');
+}
+});
+});
+body.querySelector('#anonymityCheck').addEventListener('click',function(){
+ratingAnonymous=!ratingAnonymous;
+this.classList.toggle('checked',ratingAnonymous);
+});
+body.querySelector('#ratingSubmitBtn').addEventListener('click',function(){
+alert('评分提交成功！\n星级：'+ratingStars+'\n标签：'+ratingSelectedTags.join('、')+'\n匿名：'+(ratingAnonymous?'是':'否'));
+showPage('detail');
+});
+showPage('rating');
+}
+
+function bindMallEvents(){
+const si=document.getElementById('mallSearchInput');
+const sb=document.getElementById('mallSearchBtn');
+if(sb)sb.addEventListener('click',()=>{
+document.getElementById('searchPageInput').value=si?si.value:'';
+showPage('search');
+renderMallList('all','searchResultWrap');
+});
+const mt=document.querySelectorAll('#mallTabs .mall-tab');
+mt.forEach(t=>t.addEventListener('click',function(){
+mt.forEach(x=>x.classList.remove('active'));
+this.classList.add('active');
+renderMallList(this.getAttribute('data-mall-filter'));
+}));
+let slide=0;
+const track=document.getElementById('carouselTrack');
+const dots=document.querySelectorAll('#carouselDots .dot');
+if(track)setInterval(()=>{slide=(slide+1)%3;track.style.transform=`translateX(-${slide*100}%)`;dots.forEach((d,i)=>d.classList.toggle('active',i===slide))},3000);
+}
+
+document.addEventListener('DOMContentLoaded',function(){
+document.querySelectorAll('#mainTabs .main-tab').forEach(tab=>{
+tab.addEventListener('click',function(){
+document.querySelectorAll('#mainTabs .main-tab').forEach(t=>t.classList.remove('active'));
+this.classList.add('active');
+renderHomeContent(this.getAttribute('data-target'));
+});
+});
+
+const filterTags=document.querySelectorAll('.filter-tag');
+filterTags.forEach(tag=>{
+tag.addEventListener('click',function(){
+filterTags.forEach(t=>t.classList.remove('active'));
+this.classList.add('active');
+currentMainFilter=this.getAttribute('data-filter');
+currentSubFilter=null;
+document.getElementById('dynamicTag').classList.remove('show');
+document.querySelectorAll('.more-tag').forEach(t=>t.classList.remove('selected'));
+renderSupplyList();
+});
+});
+
+document.getElementById('btnMore').addEventListener('click',function(e){
+e.stopPropagation();
+document.getElementById('morePanel').classList.toggle('show');
+this.classList.toggle('active');
+});
+document.addEventListener('click',function(e){
+const mp=document.getElementById('morePanel');
+const bm=document.getElementById('btnMore');
+if(!mp.contains(e.target)&&e.target!==bm){mp.classList.remove('show');bm.classList.remove('active')}
+});
+
+document.querySelectorAll('.more-tag').forEach(tag=>{
+tag.addEventListener('click',function(){
+document.querySelectorAll('.more-tag').forEach(t=>t.classList.remove('selected'));
+this.classList.add('selected');
+currentSubFilter=this.getAttribute('data-filter');
+document.getElementById('dynamicTagText').textContent=this.textContent;
+document.getElementById('dynamicTag').classList.add('show');
+filterTags.forEach(t=>t.classList.remove('active'));
+document.getElementById('morePanel').classList.remove('show');
+document.getElementById('btnMore').classList.remove('active');
+renderSupplyList();
+});
+});
+
+document.getElementById('closeDynamicTag').addEventListener('click',function(e){
+e.stopPropagation();
+currentSubFilter=null;
+document.getElementById('dynamicTag').classList.remove('show');
+document.querySelectorAll('.more-tag').forEach(t=>t.classList.remove('selected'));
+document.querySelector('.filter-tag[data-filter="all"]').classList.add('active');
+renderSupplyList();
+});
+
+document.getElementById('detailBackBtn').addEventListener('click',()=>showPage('home'));
+document.getElementById('ratingBackBtn').addEventListener('click',()=>showPage('detail'));
+document.getElementById('searchBackBtn').addEventListener('click',()=>showPage('home'));
+
+document.getElementById('searchPageBtn').addEventListener('click',function(){
+const active=document.querySelector('#searchTabs .search-tab.active');
+renderMallList(active?active.getAttribute('data-search-filter'):'all','searchResultWrap');
+});
+document.querySelectorAll('#searchTabs .search-tab').forEach(tab=>{
+tab.addEventListener('click',function(){
+document.querySelectorAll('#searchTabs .search-tab').forEach(t=>t.classList.remove('active'));
+this.classList.add('active');
+renderMallList(this.getAttribute('data-search-filter'),'searchResultWrap');
+});
+});
+
+document.getElementById('detailScrollContent').addEventListener('click',function(e){
+if(e.target.closest('#ratingEntry'))showRating();
+});
+document.getElementById('detailBottomBar').addEventListener('click',function(e){
+if(e.target.closest('#btnReport'))alert('举报已提交');
+if(e.target.closest('#btnShare'))alert('分享链接已复制');
+if(e.target.closest('#btnLike')){
+const icon=e.target.closest('#btnLike').querySelector('svg');
+icon.style.fill=icon.style.fill==='rgb(255, 77, 79)'?'#646A73':'#FF4D4F';
+}
+});
+
+renderHomeContent('supply');
+});
+</script>
+</body>
+</html>
