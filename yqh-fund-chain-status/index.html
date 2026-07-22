@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>悦轻荷 · 资金链路现状图</title>
+<style>
+  :root{
+    --ink:#0E2233;          /* 深钢蓝墨 */
+    --ink-2:#33485c;
+    --muted:#5B7085;
+    --bg:#EAEFF4;           /* 冷灰白 */
+    --card:#FFFFFF;
+    --line:#D5DEE7;
+    --flow:#1C7ED6;         /* 资金流动蓝 */
+    --ok:#1E9E6A;           /* 已打通 */
+    --warn:#D99400;         /* 内部处理中 */
+    --stop:#D6455D;         /* 待启用 / 待开发 */
+    --shadow:0 1px 2px rgba(14,34,51,.06), 0 8px 24px rgba(14,34,51,.07);
+    --font: "Segoe UI Variable Display","Segoe UI","PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    font-family:var(--font);
+    color:var(--ink);
+    background:
+      radial-gradient(1200px 600px at 80% -10%, #F3F7FB 0%, transparent 60%),
+      var(--bg);
+    line-height:1.55;
+    padding:40px 24px 64px;
+    letter-spacing:.1px;
+  }
+  .wrap{max-width:960px;margin:0 auto}
+
+  /* ---------- header ---------- */
+  header{margin-bottom:34px}
+  .eyebrow{
+    font-size:12px;font-weight:700;letter-spacing:2.4px;text-transform:uppercase;
+    color:var(--flow);margin-bottom:12px;
+  }
+  h1{
+    font-size:clamp(28px,4.4vw,42px);font-weight:800;line-height:1.08;
+    letter-spacing:-.6px;color:var(--ink);
+  }
+  h1 .thin{font-weight:400;color:var(--ink-2)}
+  .sub{margin-top:12px;color:var(--muted);font-size:15.5px;max-width:60ch}
+  .meta{
+    margin-top:18px;display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;
+    font-size:13px;color:var(--muted);
+  }
+  .meta b{color:var(--ink);font-weight:700}
+
+  /* ---------- legend ---------- */
+  .legend{
+    display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 6px;
+  }
+  .lg{
+    display:inline-flex;align-items:center;gap:8px;
+    background:var(--card);border:1px solid var(--line);border-radius:999px;
+    padding:7px 13px 7px 10px;font-size:12.5px;font-weight:600;color:var(--ink-2);
+    box-shadow:var(--shadow);
+  }
+  .dot{width:11px;height:11px;border-radius:50%;flex:none}
+  .dot.ok{background:var(--ok)} .dot.warn{background:var(--warn)} .dot.stop{background:var(--stop)}
+
+  .hint{
+    margin:20px 0 30px;font-size:13.5px;color:var(--ink-2);
+    background:linear-gradient(180deg,#fff, #fbfdff);
+    border:1px solid var(--line);border-left:3px solid var(--flow);
+    border-radius:10px;padding:13px 16px;box-shadow:var(--shadow)
+  }
+  .hint b{color:var(--ink)}
+
+  /* ---------- pipeline ---------- */
+  .flow{margin-top:8px}
+  .stop{
+    display:grid;grid-template-columns:52px 1fr;gap:16px;align-items:stretch;
+  }
+  .rail{position:relative;display:flex;justify-content:center}
+  .rail::before, .rail::after{
+    content:"";position:absolute;left:50%;transform:translateX(-50%);
+    width:4px;background:var(--seg,var(--flow));border-radius:4px;
+  }
+  .rail::before{top:0;height:26px}                 /* 进线 */
+  .rail::after{top:26px;bottom:0;background:var(--out,var(--flow))}  /* 出线 */
+  .stop:first-child .rail::before{display:none}
+  .stop:last-child .rail::after{display:none}
+  .node{
+    position:relative;z-index:2;margin-top:16px;
+    width:26px;height:26px;border-radius:50%;
+    background:#fff;border:3px solid var(--nc,var(--flow));
+    display:flex;align-items:center;justify-content:center;
+    font-size:13px;font-weight:800;color:var(--nc,var(--flow));
+    box-shadow:0 0 0 4px rgba(255,255,255,.9), var(--shadow);
+  }
+  /* 断口闸门 */
+  .stop.cut{--out:var(--stop)}
+  .stop.cut .rail::after{
+    background:repeating-linear-gradient(var(--stop) 0 7px, transparent 7px 13px);
+  }
+  .gate{
+    position:absolute;left:50%;top:50px;transform:translate(-50%,0);z-index:3;
+    background:var(--stop);color:#fff;font-size:10px;font-weight:800;
+    padding:2px 7px;border-radius:6px;letter-spacing:1px;white-space:nowrap;
+    box-shadow:var(--shadow)
+  }
+
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:16px 18px;margin:10px 0;box-shadow:var(--shadow);
+    border-left:4px solid var(--nc,var(--flow));
+  }
+  .card .top{display:flex;flex-wrap:wrap;gap:10px 12px;align-items:center;justify-content:space-between}
+  .card h3{font-size:17px;font-weight:750;letter-spacing:-.2px}
+  .card h3 .en{font-weight:500;color:var(--muted);font-size:12.5px;margin-left:6px;letter-spacing:.4px}
+  .badge{
+    font-size:11.5px;font-weight:800;letter-spacing:.4px;
+    padding:4px 10px;border-radius:999px;white-space:nowrap;
+  }
+  .badge.ok{background:rgba(30,158,106,.12);color:#137a4f}
+  .badge.warn{background:rgba(217,148,0,.14);color:#9a6b00}
+  .badge.stop{background:rgba(214,69,93,.12);color:#b52f47}
+  .card p{margin-top:8px;font-size:13.7px;color:var(--ink-2)}
+  .card .todo{
+    margin-top:11px;font-size:12.7px;color:#a33049;
+    background:rgba(214,69,93,.07);border:1px dashed rgba(214,69,93,.4);
+    border-radius:9px;padding:8px 11px
+  }
+  .card .todo b{color:#b52f47}
+
+  /* 子项（真实分账下挂的待接入动作） */
+  .sub{margin:2px 0 12px 0}
+  .sub .chip{
+    display:inline-flex;align-items:center;gap:7px;
+    font-size:12.5px;font-weight:650;color:var(--ink-2);
+    background:var(--card);border:1px solid var(--line);border-radius:9px;
+    padding:7px 11px;margin:4px 8px 0 0;box-shadow:var(--shadow)
+  }
+  .chip .mini{width:8px;height:8px;border-radius:50%;background:var(--stop);flex:none}
+
+  /* ---------- 分岔说明 ---------- */
+  .branch{
+    grid-column:2;margin:2px 0 10px;font-size:12.7px;color:var(--muted);
+    display:flex;gap:8px;align-items:flex-start
+  }
+  .branch b{color:var(--ink-2)}
+
+  /* ---------- 底部：旁路 + 支撑 + 卡点 ---------- */
+  h2.section{
+    font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;
+    color:var(--muted);margin:40px 0 14px;padding-top:26px;border-top:1px solid var(--line)
+  }
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .mini-card{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:15px 17px;box-shadow:var(--shadow);border-top:3px solid var(--nc,var(--flow))
+  }
+  .mini-card .top{display:flex;gap:10px;align-items:center;justify-content:space-between}
+  .mini-card h4{font-size:15px;font-weight:750}
+  .mini-card p{margin-top:7px;font-size:13px;color:var(--ink-2)}
+
+  .todos{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .tcard{
+    background:linear-gradient(180deg,#fff,#fcfdff);
+    border:1px solid var(--line);border-radius:14px;padding:16px 18px;box-shadow:var(--shadow);
+    position:relative;padding-left:20px
+  }
+  .tcard::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:4px;border-radius:4px;background:var(--nc,var(--stop))}
+  .tcard h4{font-size:14.5px;font-weight:750;margin-bottom:6px;display:flex;gap:9px;align-items:center}
+  .tcard .tag{font-size:10.5px;font-weight:800;letter-spacing:.5px;color:#fff;background:var(--nc,var(--stop));padding:2px 7px;border-radius:5px}
+  .tcard p{font-size:12.8px;color:var(--ink-2)}
+
+  footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);font-size:11.5px;color:var(--muted);text-align:center}
+
+  /* ---------- 载入注水动画 ---------- */
+  @keyframes fill{from{transform:translateY(-100%)} to{transform:translateY(0)}}
+  @media (prefers-reduced-motion:no-preference){
+    .rail::after{animation:fill .5s ease both}
+    .stop:nth-child(1) .rail::after{animation-delay:.05s}
+    .stop:nth-child(2) .rail::after{animation-delay:.15s}
+    .stop:nth-child(3) .rail::after{animation-delay:.25s}
+    .stop:nth-child(4) .rail::after{animation-delay:.35s}
+    .stop:nth-child(5) .rail::after{animation-delay:.45s}
+    .stop:nth-child(6) .rail::after{animation-delay:.55s}
+    .card,.mini-card,.tcard{animation:rise .5s ease both}
+    @keyframes rise{from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none}}
+  }
+
+  @media (max-width:680px){
+    .grid2,.todos{grid-template-columns:1fr}
+    body{padding:28px 16px 48px}
+  }
+  @media print{
+    body{background:#fff;padding:0}
+    .card,.mini-card,.tcard,.lg{box-shadow:none}
+    *{animation:none!important}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">悦轻荷供应链 · 资金中台</div>
+    <h1>资金链路现状图<br><span class="thin">收款 → 分账 → 提现　全链路打通视图</span></h1>
+    <p class="sub">这张图按资金实际流动的顺序，展示每个环节当前的打通情况，并标出仍需推进的节点。</p>
+    <div class="meta">
+      <span>更新日期 <b>2026-07-22</b></span>
+      <span>范围 <b>支付后资金链路</b></span>
+      <span>口径 <b>四套环境一致（开发 / 联调 / 预发 / 生产）</b></span>
+    </div>
+
+    <div class="legend">
+      <span class="lg"><span class="dot ok"></span>已打通 · 真实到账</span>
+      <span class="lg"><span class="dot warn"></span>平台内部处理中</span>
+      <span class="lg"><span class="dot stop"></span>待启用 / 待开发</span>
+    </div>
+
+    <div class="hint">
+      <b>怎么看这张图：</b>中间的竖向管道就是资金流。<b style="color:#137a4f">绿色段</b>表示资金真实流动，<b style="color:#9a6b00">琥珀段</b>表示资金已在平台账面记账、尚未对外划付，<b style="color:#b52f47">红色闸门 ⛔</b> 就是当前的卡点——资金流到这里暂时出不去。
+    </div>
+  </header>
+
+  <!-- ================= 资金主管道 ================= -->
+  <div class="flow">
+
+    <!-- 1 收款 -->
+    <div class="stop" style="--nc:var(--ok);--out:var(--ok)">
+      <div class="rail"><div class="node">✓</div></div>
+      <div class="card">
+        <div class="top">
+          <h3>买家下单收款<span class="en">Collect</span></h3>
+          <span class="badge ok">已打通</span>
+        </div>
+        <p>买家付款通过通企付（通联支付）实时到账，四套环境均已开启真实支付通道。</p>
+      </div>
+    </div>
+
+    <!-- 2 预分账/归集 -->
+    <div class="stop" style="--nc:var(--warn);--out:var(--warn)">
+      <div class="rail"><div class="node">~</div></div>
+      <div class="card">
+        <div class="top">
+          <h3>平台资金归集（预分账）<span class="en">Pre-Division</span></h3>
+          <span class="badge warn">内部记账</span>
+        </div>
+        <p>订单出库即在平台账面完成资金归集与预分配，货款已在平台侧安全留存，等待按账期结算给供应商。</p>
+      </div>
+    </div>
+
+    <!-- 3 T+N 结算 -->
+    <div class="stop" style="--nc:var(--warn);--out:var(--warn)">
+      <div class="rail"><div class="node">~</div></div>
+      <div class="card">
+        <div class="top">
+          <h3>按账期结算（T+N 到期）<span class="en">Settlement</span></h3>
+          <span class="badge warn">内部结算</span>
+        </div>
+        <p>账期到期后，系统自动将货款结算进供应商「可用余额」。当前为平台内部结算，资金记于账面。</p>
+      </div>
+    </div>
+
+    <!-- 4 供应商余额 -->
+    <div class="stop" style="--nc:var(--ok);--out:var(--stop)">
+      <div class="rail"><div class="node">✓</div></div>
+      <div class="card">
+        <div class="top">
+          <h3>供应商余额账面<span class="en">Balance</span></h3>
+          <span class="badge ok">已打通</span>
+        </div>
+        <p>供应商的可用余额、冻结、可提现金额实时反映，账面流水完整且防重复入账。</p>
+      </div>
+    </div>
+
+    <!-- 分岔说明 -->
+    <div class="stop" style="--nc:var(--stop)">
+      <div class="rail">
+        <div class="node" style="--nc:var(--stop)">⛔</div>
+        <span class="gate">待启用</span>
+      </div>
+      <div>
+        <div class="card cut-card" style="--nc:var(--stop)">
+          <div class="top">
+            <h3>真实自动分账（通企付）<span class="en">Division</span></h3>
+            <span class="badge stop">待启用</span>
+          </div>
+          <p>把货款从平台真实划付到各供应商的分账下单与查询，已完成与通企付的对接与联调；当前灰度开关未开，由财务按账目人工分配。</p>
+          <div class="todo"><b>待推进：</b>打开灰度开关前，先在隔离环境完成小额真实分账验收与并发可靠性加固。</div>
+        </div>
+        <div class="sub">
+          <span class="chip"><span class="mini"></span>分账撤销 · 待接入</span>
+          <span class="chip"><span class="mini"></span>自动打款出款 · 待接入</span>
+          <span class="chip"><span class="mini"></span>分账对账入账 · 随分账上线</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6 提现 -->
+    <div class="stop cut" style="--nc:var(--warn)">
+      <div class="rail">
+        <div class="node" style="--nc:var(--warn)">~</div>
+        <span class="gate">打款待接入</span>
+      </div>
+      <div class="card" style="--nc:var(--warn)">
+        <div class="top">
+          <h3>供应商提现<span class="en">Withdrawal</span></h3>
+          <span class="badge warn">部分打通</span>
+        </div>
+        <p>提现申请、审批、账面冻结/扣减流转已全部打通；「自动打款到银行」尚未接入，当前由财务人工打款（系统含超时兜底保障）。</p>
+        <div class="todo"><b>待推进：</b>接入自动打款渠道；提现高并发处理上线前完成加固。</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ================= 旁路：会员开户 ================= -->
+  <h2 class="section">配套能力</h2>
+  <div class="grid2">
+    <div class="mini-card" style="--nc:var(--warn)">
+      <div class="top"><h4>供应商通企付会员注册</h4><span class="badge warn">线上待发版</span></div>
+      <p>供应商开户的邀请链接已对接通企付真实接口，本地验证通过；线上后端发版后即可使用（当前线上为旧版本，故页面暂报错）。</p>
+    </div>
+    <div class="mini-card" style="--nc:var(--stop)">
+      <div class="top"><h4>运营工作台（分账台账 / 账户管理）</h4><span class="badge stop">待开发</span></div>
+      <p>后端接口已就绪，供运营查看分账台账、重试记账、管理供应商通企付账户的前端页面与菜单权限待开发。</p>
+    </div>
+  </div>
+
+  <!-- ================= 卡点与待办 ================= -->
+  <h2 class="section">当前卡点与待办</h2>
+  <div class="todos">
+    <div class="tcard" style="--nc:var(--stop)">
+      <h4><span class="tag">核心</span>自动分账 · 自动打款待上线</h4>
+      <p>系统已就绪，等待灰度上线；上线前当前由财务人工处理，资金安全与账面正确不受影响。</p>
+    </div>
+    <div class="tcard" style="--nc:var(--warn)">
+      <h4><span class="tag" style="--nc:var(--warn)">发版</span>通企付会员注册线上待发版</h4>
+      <p>本地已验证通过，重新发布后端服务即可解除线上页面报错。</p>
+    </div>
+    <div class="tcard" style="--nc:var(--stop)">
+      <h4><span class="tag">开发</span>运营工作台待开发</h4>
+      <p>分账台账、记账重试、通企付账户管理页面及菜单权限尚未落地。</p>
+    </div>
+    <div class="tcard" style="--nc:var(--warn)">
+      <h4><span class="tag" style="--nc:var(--warn)">加固</span>高并发可靠性待加固</h4>
+      <p>提现与分账在多实例并发场景下的处理，需在正式启用前完成加固与验收。</p>
+    </div>
+  </div>
+
+  <footer>
+    悦轻荷供应链 · 资金链路现状图　|　仅供内部与客户沟通使用　|　状态以 2026-07-22 代码基线为准
+  </footer>
+
+</div>
+</body>
+</html>
