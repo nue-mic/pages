@@ -1,176 +1,266 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>悦轻荷 · 页面发布站</title>
-<meta name="description" content="悦轻荷供应链对外页面发布站，集中收录脱敏展示页与对外沟通文档。" />
-<meta property="og:type" content="website" />
-<meta property="og:title" content="悦轻荷 · 页面发布站" />
-<meta property="og:description" content="悦轻荷供应链对外页面发布站，集中收录脱敏展示页与对外沟通文档。" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>nue · 站点索引</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --ink:#0E2233;          /* 深钢蓝墨 */
-    --ink-2:#33485c;
-    --muted:#5B7085;
-    --bg:#EAEFF4;           /* 冷灰白 */
-    --card:#FFFFFF;
-    --line:#D5DEE7;
-    --flow:#1C7ED6;         /* 主题蓝 */
-    --ok:#1E9E6A;
-    --warn:#D99400;
-    --stop:#D6455D;
-    --shadow:0 1px 2px rgba(14,34,51,.06), 0 8px 24px rgba(14,34,51,.07);
-    --shadow-lift:0 2px 4px rgba(14,34,51,.08), 0 18px 40px rgba(14,34,51,.12);
-    --font: "Segoe UI Variable Display","Segoe UI","PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html{-webkit-text-size-adjust:100%}
-  body{
-    font-family:var(--font);
-    color:var(--ink);
-    background:
-      radial-gradient(1200px 600px at 80% -10%, #F3F7FB 0%, transparent 60%),
-      var(--bg);
-    line-height:1.55;
-    padding:56px 24px 72px;
-    letter-spacing:.1px;
-    min-height:100vh;
-  }
-  .wrap{max-width:960px;margin:0 auto}
+:root{
+  --bg:#08090F; --panel:#10131F; --panel-2:#161A2A;
+  --ink:#EAECF3; --muted:#828BA3; --line:rgba(255,255,255,.08);
+  --violet:#6D5EF6; --teal:#2DD4BF; --rose:#FB7185;
+  --r:18px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{color-scheme:dark}
+body{
+  font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:var(--bg);color:var(--ink);min-height:100vh;
+  overflow-x:hidden;-webkit-font-smoothing:antialiased;
+}
+.aurora{position:fixed;inset:0;z-index:0;pointer-events:none;filter:blur(80px);opacity:.55}
+.aurora span{position:absolute;border-radius:50%;mix-blend-mode:screen;animation:drift 22s ease-in-out infinite}
+.aurora .a{width:44vw;height:44vw;left:-8vw;top:-10vw;background:radial-gradient(circle,#6D5EF6,transparent 65%)}
+.aurora .b{width:40vw;height:40vw;right:-6vw;top:6vh;background:radial-gradient(circle,#2DD4BF,transparent 65%);animation-delay:-7s}
+.aurora .c{width:36vw;height:36vw;left:30vw;bottom:-14vw;background:radial-gradient(circle,#FB7185,transparent 65%);animation-delay:-13s}
+@keyframes drift{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(6vw,4vh) scale(1.08)}66%{transform:translate(-4vw,-3vh) scale(.95)}}
 
-  /* ---------- header ---------- */
-  header{margin-bottom:36px}
-  .eyebrow{
-    font-size:12px;font-weight:700;letter-spacing:2.4px;text-transform:uppercase;
-    color:var(--flow);margin-bottom:12px;
-  }
-  h1{
-    font-size:clamp(30px,4.6vw,44px);font-weight:800;line-height:1.06;
-    letter-spacing:-.6px;color:var(--ink);
-  }
-  h1 .thin{font-weight:400;color:var(--ink-2)}
-  .sub{margin-top:14px;color:var(--muted);font-size:15.5px;max-width:60ch}
-  .meta{
-    margin-top:18px;display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;
-    font-size:13px;color:var(--muted);
-  }
-  .meta b{color:var(--ink);font-weight:700}
+.wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:56px 24px 80px}
 
-  /* ---------- section label ---------- */
-  h2.section{
-    font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;
-    color:var(--muted);margin:38px 0 16px;padding-top:26px;border-top:1px solid var(--line)
-  }
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:14px}
+.logo{width:46px;height:46px;border-radius:13px;position:relative;
+  background:conic-gradient(from 210deg,var(--violet),var(--teal),var(--rose),var(--violet));
+  box-shadow:0 0 0 1px rgba(255,255,255,.08),0 8px 30px rgba(109,94,246,.35)}
+.logo::after{content:"";position:absolute;inset:6px;border-radius:8px;background:var(--bg)}
+.logo b{position:absolute;inset:0;display:grid;place-items:center;font-family:"Space Grotesk";font-weight:700;font-size:19px;z-index:2;
+  background:linear-gradient(120deg,#fff,#c8c2ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.brand h1{font-family:"Space Grotesk";font-weight:600;font-size:19px;letter-spacing:.2px}
+.brand p{font-size:12.5px;color:var(--muted);margin-top:2px;font-family:"JetBrains Mono"}
+.stat{font-family:"JetBrains Mono";font-size:12.5px;color:var(--muted);text-align:right;line-height:1.7}
+.stat b{color:var(--teal)}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--teal);margin-right:6px;box-shadow:0 0 8px var(--teal);vertical-align:middle;animation:pulse 2.4s infinite}
+@keyframes pulse{50%{opacity:.35}}
 
-  /* ---------- cards grid ---------- */
-  .grid{
-    display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;
-  }
-  a.card{
-    display:flex;flex-direction:column;text-decoration:none;color:inherit;
-    background:var(--card);border:1px solid var(--line);border-radius:16px;
-    padding:20px 20px 18px;box-shadow:var(--shadow);
-    border-left:4px solid var(--nc,var(--flow));
-    transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
-    outline:none;
-  }
-  a.card:hover, a.card:focus-visible{
-    transform:translateY(-3px);box-shadow:var(--shadow-lift);
-  }
-  a.card:focus-visible{border-color:var(--flow);box-shadow:var(--shadow-lift),0 0 0 3px rgba(28,126,214,.28)}
-  .card .top{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-bottom:2px}
-  .card h3{font-size:17.5px;font-weight:750;letter-spacing:-.2px}
-  .badge{
-    font-size:11.5px;font-weight:800;letter-spacing:.4px;
-    padding:4px 10px;border-radius:999px;white-space:nowrap;
-  }
-  .badge.ok{background:rgba(30,158,106,.12);color:#137a4f}
-  .badge.warn{background:rgba(217,148,0,.14);color:#9a6b00}
-  .card p.desc{margin-top:9px;font-size:13.7px;color:var(--ink-2);flex:1}
-  .card .foot{
-    margin-top:16px;padding-top:13px;border-top:1px solid var(--line);
-    display:flex;align-items:center;justify-content:space-between;
-    font-size:12.5px;color:var(--muted);
-  }
-  .card .foot .date b{color:var(--ink-2);font-weight:700}
-  .card .go{
-    display:inline-flex;align-items:center;gap:6px;
-    font-weight:700;color:var(--flow);font-size:12.8px;
-  }
-  .card .go svg{transition:transform .18s ease}
-  a.card:hover .go svg{transform:translateX(3px)}
+.hero{margin:44px 0 30px}
+.hero h2{font-family:"Space Grotesk";font-weight:700;font-size:clamp(34px,6vw,60px);line-height:1.02;letter-spacing:-1.5px}
+.hero h2 .g{background:linear-gradient(100deg,var(--violet),var(--teal) 55%,var(--rose));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero .sub{margin-top:16px;color:var(--muted);font-size:15.5px;max-width:520px;line-height:1.6}
 
-  /* ---------- 占位卡（预留结构） ---------- */
-  .card.placeholder{
-    border-style:dashed;border-left-style:dashed;background:transparent;box-shadow:none;
-    color:var(--muted);align-items:center;justify-content:center;text-align:center;
-    min-height:150px;cursor:default;--nc:var(--line);
-  }
-  .card.placeholder:hover{transform:none;box-shadow:none}
-  .card.placeholder .plus{
-    width:32px;height:32px;border-radius:50%;border:1.5px dashed var(--muted);
-    display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:400;margin-bottom:10px;
-  }
-  .card.placeholder p{font-size:13px}
+.search{margin:26px 0 8px;position:relative;max-width:460px}
+.search input{width:100%;background:var(--panel);border:1px solid var(--line);color:var(--ink);
+  font-size:14.5px;font-family:inherit;padding:14px 16px 14px 44px;border-radius:14px;outline:none;transition:.2s}
+.search input:focus{border-color:rgba(109,94,246,.6);box-shadow:0 0 0 4px rgba(109,94,246,.14)}
+.search input::placeholder{color:var(--muted)}
+.search svg{position:absolute;left:15px;top:50%;transform:translateY(-50%);width:17px;height:17px;stroke:var(--muted)}
+.search kbd{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-family:"JetBrains Mono";font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:2px 7px;background:var(--panel-2)}
 
-  footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--line);font-size:11.5px;color:var(--muted);text-align:center}
+.grid{margin-top:30px;display:grid;gap:22px;grid-template-columns:repeat(auto-fill,minmax(268px,1fr))}
+.card{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;
+  text-decoration:none;color:inherit;display:flex;flex-direction:column;
+  transition:transform .28s cubic-bezier(.2,.7,.2,1),border-color .28s,box-shadow .28s}
+.card:hover{transform:translateY(-6px);border-color:rgba(109,94,246,.5);box-shadow:0 18px 44px -18px rgba(109,94,246,.55)}
+.card:focus-visible{outline:2px solid var(--teal);outline-offset:3px}
+.shot{position:relative;height:300px;overflow:hidden;background:var(--panel-2);border-bottom:1px solid var(--line)}
+.shot .ph{position:absolute;inset:0;background:
+  radial-gradient(120% 90% at 20% 0%,rgba(109,94,246,.28),transparent 60%),
+  radial-gradient(120% 90% at 90% 30%,rgba(45,212,191,.22),transparent 60%);
+  display:grid;place-items:center}
+.shot .ph span{font-family:"Space Grotesk";font-weight:700;font-size:40px;color:rgba(255,255,255,.14);letter-spacing:1px}
+.shot iframe{position:absolute;top:0;left:0;width:1280px;height:900px;border:0;transform-origin:top left;pointer-events:none;background:#fff;opacity:0;transition:opacity .5s}
+.shot iframe.on{opacity:1}
+.badge{position:absolute;top:11px;right:11px;z-index:3;font-family:"JetBrains Mono";font-size:10.5px;font-weight:500;letter-spacing:.3px;
+  padding:3px 8px;border-radius:20px;color:#fff;backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.18)}
+.badge.mobile{background:rgba(45,212,191,.22)}
+.badge.pc{background:rgba(109,94,246,.28)}
+.glow{position:absolute;left:0;right:0;bottom:0;height:70px;background:linear-gradient(to top,rgba(16,19,31,.9),transparent);pointer-events:none}
+.meta{padding:15px 16px 16px}
+.meta .row{display:flex;align-items:center;gap:9px}
+.idx{font-family:"JetBrains Mono";font-size:11px;color:var(--violet);border:1px solid rgba(109,94,246,.35);border-radius:6px;padding:1px 6px}
+.meta h3{font-family:"Space Grotesk";font-weight:600;font-size:16.5px}
+.meta p{color:var(--muted);font-size:13px;margin-top:7px;line-height:1.5;min-height:19px}
+.foot{display:flex;align-items:center;justify-content:space-between;margin-top:13px}
+.path{font-family:"JetBrains Mono";font-size:11.5px;color:var(--muted);opacity:.8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.open{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;color:var(--teal);font-weight:600;white-space:nowrap}
+.open svg{width:13px;height:13px;stroke:currentColor;transition:transform .25s}
+.card:hover .open svg{transform:translate(2px,-2px)}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:11px}
+.tag{font-size:11px;color:var(--muted);background:var(--panel-2);border:1px solid var(--line);border-radius:20px;padding:2px 9px}
 
-  @media (prefers-reduced-motion:no-preference){
-    a.card{animation:rise .5s ease both}
-    .grid a.card:nth-child(2){animation-delay:.06s}
-    .grid a.card:nth-child(3){animation-delay:.12s}
-    @keyframes rise{from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none}}
-  }
-  @media (max-width:680px){
-    body{padding:36px 16px 56px}
-    .grid{grid-template-columns:1fr}
-  }
+.empty{grid-column:1/-1;text-align:center;padding:70px 20px;color:var(--muted)}
+.empty b{display:block;color:var(--ink);font-family:"Space Grotesk";font-size:18px;margin-bottom:8px}
+
+footer{margin-top:60px;padding-top:22px;border-top:1px solid var(--line);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;
+  font-family:"JetBrains Mono";font-size:12px;color:var(--muted)}
+footer a{color:var(--muted);text-decoration:none;border-bottom:1px dotted rgba(255,255,255,.2)}
+
+@media (max-width:560px){.wrap{padding:36px 16px 60px}.shot{height:260px}}
+@media (prefers-reduced-motion:reduce){.aurora span{animation:none}.card{transition:none}}
 </style>
 </head>
 <body>
+<div class="aurora"><span class="a"></span><span class="b"></span><span class="c"></span></div>
+
 <div class="wrap">
-
-  <header>
-    <div class="eyebrow">悦轻荷供应链 · 对外发布</div>
-    <h1>页面发布站<br><span class="thin">脱敏展示页与对外沟通文档索引</span></h1>
-    <p class="sub">这里集中收录悦轻荷对外公开的脱敏页面。每个页面独立成册，点击卡片即可查看。</p>
-    <div class="meta">
-      <span>维护 <b>悦轻荷供应链团队</b></span>
-      <span>最近更新 <b>2026-07-22</b></span>
-    </div>
-  </header>
-
-  <h2 class="section">已发布页面</h2>
-  <div class="grid">
-
-    <!-- 卡片 1：资金链路现状图 -->
-    <a class="card" href="./yqh-fund-chain-status/" style="--nc:var(--flow)">
-      <div class="top">
-        <h3>资金链路现状图</h3>
-        <span class="badge ok">脱敏</span>
+  <div class="top">
+    <div class="brand">
+      <div class="logo"><b>N</b></div>
+      <div>
+        <h1>nue · 站点索引</h1>
+        <p>nue-mic.github.io/pages</p>
       </div>
-      <p class="desc">按资金实际流动的顺序，展示收款 → 分账 → 提现全链路各环节的打通情况与待推进节点。</p>
-      <div class="foot">
-        <span class="date">更新 <b>2026-07-22</b></span>
-        <span class="go">查看
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-        </span>
-      </div>
-    </a>
-
-    <!-- 预留结构：以后新增页面复制上面的 <a class="card"> 即可 -->
-    <div class="card placeholder" aria-hidden="true">
-      <div class="plus">+</div>
-      <p>后续新页面<br>将陆续收录于此</p>
     </div>
-
+    <div class="stat">
+      <div><span class="dot"></span>全部在线</div>
+      <div><b id="count">0</b> 个项目</div>
+    </div>
   </div>
 
-  <footer>
-    悦轻荷供应链 · 页面发布站　|　仅收录脱敏对外内容　|　https://nue-mic.github.io/pages/
-  </footer>
+  <div class="hero">
+    <h2>作品<span class="g">发布台</span>。</h2>
+    <p class="sub">这里汇集所有已上线的网页，移动端与 PC 皆可。每张卡片都是页面的实时预览——点开即达。</p>
+    <div class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg>
+      <input id="q" type="text" placeholder="搜索项目名、描述或标签…" autocomplete="off" spellcheck="false">
+      <kbd>/</kbd>
+    </div>
+  </div>
 
+  <div class="grid" id="grid"></div>
+
+  <footer>
+    <span>© <span id="yr"></span> nue-mic · GitHub Pages</span>
+    <span>点击卡片在新标签打开 · <a href="https://github.com/nue-mic/pages" target="_blank" rel="noopener">仓库</a></span>
+  </footer>
 </div>
+
+<script>
+const META = {
+  "yq2": { title: "仪圈", desc: "移动端首页 · 新一波改动", tags: ["移动端","H5"], type: "mobile" },
+  "yqh-fund-chain-status": { title: "悦轻荷 · 资金链路现状图", desc: "支付 → 分账 → 提现 全链路打通视图（脱敏）", tags: ["资金","脱敏"], type: "pc" }
+};
+const PROJECTS = ["yq2", "yqh-fund-chain-status"];
+const DEFAULT_TYPE = "pc";
+const VW = { mobile: 390, pc: 1280 };
+const REPO = "nue-mic/pages";
+const BASE = "./";
+
+const grid = document.getElementById('grid');
+const qEl = document.getElementById('q');
+let cards = [];
+
+function cardHTML(slug, i){
+  const m = META[slug] || {};
+  const title = m.title || slug;
+  const desc = m.desc || "";
+  const tags = m.tags || [];
+  const type = m.type || DEFAULT_TYPE;
+  const vw = VW[type] || VW.pc;
+  const badge = type === "mobile" ? "移动端" : "PC";
+  const url = BASE + slug + "/";
+  const idx = String(i+1).padStart(2,'0');
+  return `<a class="card" href="${url}" target="_blank" rel="noopener" data-key="${(slug+' '+title+' '+desc+' '+tags.join(' ')+' '+badge).toLowerCase()}">
+    <div class="shot">
+      <div class="ph"><span>${(title[0]||slug[0]||'·').toUpperCase()}</span></div>
+      <iframe data-src="${url}" data-vw="${vw}" loading="lazy" scrolling="no" title="${title} 预览"></iframe>
+      <div class="glow"></div>
+      <span class="badge ${type}">${badge}</span>
+    </div>
+    <div class="meta">
+      <div class="row"><span class="idx">${idx}</span><h3>${title}</h3></div>
+      <p>${desc || '&nbsp;'}</p>
+      <div class="foot">
+        <span class="path">/pages/${slug}/</span>
+        <span class="open">打开<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M7 17 17 7M8 7h9v9"/></svg></span>
+      </div>
+      ${tags.length?`<div class="tags">${tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>`:''}
+    </div>
+  </a>`;
+}
+
+function render(slugs){
+  grid.innerHTML = slugs.map((s,i)=>cardHTML(s,i)).join('') ||
+    `<div class="empty"><b>还没有项目</b>往 pages 仓库里加一个文件夹就会出现在这里。</div>`;
+  document.getElementById('count').textContent = slugs.length;
+  cards = [...grid.querySelectorAll('.card')];
+  setupPreviews();
+}
+
+function setupPreviews(){
+  const io = new IntersectionObserver((es)=>{
+    es.forEach(e=>{
+      if(e.isIntersecting){
+        const f = e.target;
+        if(!f.src){ f.src = f.dataset.src; f.addEventListener('load',()=>f.classList.add('on'),{once:true}); }
+        io.unobserve(f);
+      }
+    });
+  },{rootMargin:"200px"});
+  grid.querySelectorAll('iframe').forEach(f=>io.observe(f));
+  scaleAll();
+}
+function scaleAll(){
+  grid.querySelectorAll('.shot').forEach(shot=>{
+    const f = shot.querySelector('iframe');
+    if(f){ const vw = +f.dataset.vw || 1280; const s = shot.clientWidth/vw;
+      f.style.width = vw+'px'; f.style.transform = `scale(${s})`; }
+  });
+}
+window.addEventListener('resize',scaleAll);
+
+qEl.addEventListener('input',()=>{
+  const q = qEl.value.trim().toLowerCase();
+  let shown = 0;
+  cards.forEach(c=>{
+    const hit = !q || c.dataset.key.includes(q);
+    c.style.display = hit?'':'none';
+    if(hit) shown++;
+  });
+  document.getElementById('count').textContent = shown;
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='/' && document.activeElement!==qEl){ e.preventDefault(); qEl.focus(); }
+  if(e.key==='Escape'){ qEl.value=''; qEl.dispatchEvent(new Event('input')); qEl.blur(); }
+});
+
+function sortSlugs(slugs){
+  const order = Object.keys(META);
+  return slugs.slice().sort((a,b)=>{
+    const ia=order.indexOf(a), ib=order.indexOf(b);
+    if(ia>-1||ib>-1) return (ia>-1?ia:99)-(ib>-1?ib:99);
+    return a.localeCompare(b);
+  });
+}
+
+function load(){
+  const base = (PROJECTS.length ? PROJECTS : Object.keys(META)).slice();
+  render(sortSlugs(base));
+  discover(base);
+}
+async function discover(base){
+  try{
+    const ctrl = new AbortController();
+    const t = setTimeout(()=>ctrl.abort(), 3500);
+    const r = await fetch(`https://api.github.com/repos/${REPO}/contents/?ref=main`,
+      {headers:{'Accept':'application/vnd.github+json'},signal:ctrl.signal});
+    clearTimeout(t);
+    if(!r.ok) return;
+    const items = await r.json();
+    if(!Array.isArray(items)) return;
+    const found = items.filter(x=>x.type==='dir' && !x.name.startsWith('.')).map(x=>x.name);
+    const merged = Array.from(new Set([...base, ...found]));
+    if(merged.length !== base.length){
+      render(sortSlugs(merged));
+      qEl.dispatchEvent(new Event('input'));
+    }
+  }catch(e){}
+}
+
+document.getElementById('yr').textContent = new Date().getFullYear();
+load();
+</script>
 </body>
 </html>
