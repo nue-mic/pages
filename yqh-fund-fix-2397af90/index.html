@@ -25,9 +25,73 @@
   html{scroll-behavior:smooth}
   body{font-family:var(--font);color:var(--ink);line-height:1.55;letter-spacing:.1px;
     background:radial-gradient(1100px 560px at 82% -8%,#F3F7FB 0%,transparent 60%),var(--bg);
-    padding:40px 22px 72px}
-  .wrap{max-width:1040px;margin:0 auto}
+    padding:0}
+  [id]{scroll-margin-top:24px}
+  .wrap{max-width:1080px;padding:40px 30px 76px 46px}
   a{color:var(--flow)}
+
+  /* ===== layout: 固定侧栏目录 + 正文 ===== */
+  .layout{max-width:1440px;margin:0 auto;display:grid;grid-template-columns:268px minmax(0,1fr);align-items:start}
+  .sidebar{position:sticky;top:0;height:100vh;align-self:start;overflow:hidden;z-index:40;
+    background:linear-gradient(180deg,#ffffff,#fbfdff);border-right:1px solid var(--line)}
+  .sidebar-scroll{height:100%;overflow-y:auto;overflow-x:hidden;padding:30px 15px 46px 26px;
+    scrollbar-width:thin;scrollbar-color:#c6d3df transparent;overscroll-behavior:contain}
+  .sidebar-scroll::-webkit-scrollbar{width:8px}
+  .sidebar-scroll::-webkit-scrollbar-thumb{background:#cdd9e4;border-radius:8px}
+  .sidebar-scroll::-webkit-scrollbar-thumb:hover{background:#b6c6d5}
+  .sidebar-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;
+    margin-bottom:12px;padding-bottom:13px;border-bottom:1px solid var(--line)}
+  .toc-brand{font-size:9.5px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:var(--flow);margin-bottom:5px}
+  .toc-title{font-size:13.5px;font-weight:800;color:var(--ink);line-height:1.3;letter-spacing:-.2px}
+  .sidebar-close{display:none;flex:none;width:30px;height:30px;border:1px solid var(--line);background:var(--card);
+    border-radius:8px;color:var(--muted);font-size:14px;cursor:pointer;align-items:center;justify-content:center;font-family:inherit}
+
+  /* toc links */
+  #toc{display:flex;flex-direction:column;gap:1px}
+  .toc-link{display:flex;align-items:center;gap:8px;padding:6px 10px 6px 11px;border-radius:7px;position:relative;
+    font-size:12.6px;font-weight:600;color:var(--ink-2);text-decoration:none;border-left:3px solid transparent;
+    transition:background .14s,color .14s,border-color .14s}
+  .toc-link:hover{background:#eef4f9;color:var(--ink)}
+  .toc-link:focus-visible{outline:2px solid var(--flow);outline-offset:1px}
+  .toc-link .d{width:7px;height:7px;border-radius:50%;flex:none;background:var(--flow);box-shadow:0 0 0 2px rgba(28,126,214,.14)}
+  .toc-link.lv-live .d{background:var(--live);box-shadow:0 0 0 2px rgba(192,57,43,.15)}
+  .toc-link.lv-bomb .d{background:var(--bomb);box-shadow:0 0 0 2px rgba(217,148,0,.16)}
+  .toc-link.lv-fund .d{background:var(--fund);box-shadow:0 0 0 2px rgba(214,69,93,.15)}
+  .toc-link.lv-deploy .d{background:var(--deploy);box-shadow:0 0 0 2px rgba(28,126,214,.15)}
+  .toc-link.lv-gap .d{background:var(--gap);box-shadow:0 0 0 2px rgba(91,112,133,.15)}
+  .toc-link.sub{font-size:11.6px;font-weight:550;color:var(--muted);padding-left:24px}
+  .toc-link.sub::before{content:"";position:absolute;left:13px;top:50%;width:5px;height:1px;background:#c4d0dc}
+  .toc-link.active{background:#e8f0f8;color:var(--ink);font-weight:800;border-left-color:var(--flow)}
+  .toc-link.lv-live.active{background:#fbecea;border-left-color:var(--live);color:#8a2318}
+  .toc-link.lv-bomb.active{background:#fbf3e1;border-left-color:var(--bomb);color:#8a5d00}
+  .toc-link.lv-fund.active{background:#fbecef;border-left-color:var(--fund);color:#9c2b3d}
+  .toc-link.lv-deploy.active{background:#e7f0fb;border-left-color:var(--deploy)}
+  .toc-link.lv-gap.active{background:#eef1f5;border-left-color:var(--gap)}
+
+  /* toc group headers */
+  .toc-group{display:flex;align-items:center;gap:8px;margin:15px 0 5px;padding:0 4px;
+    font-size:10px;font-weight:800;letter-spacing:.9px;text-transform:uppercase;color:var(--muted)}
+  .toc-group:first-of-type{margin-top:8px}
+  .toc-group .dot{width:9px;height:9px;border-radius:3px;flex:none}
+  .toc-group.g-live .dot{background:var(--live)}
+  .toc-group.g-bomb .dot{background:linear-gradient(135deg,var(--bomb) 0 50%,var(--fund) 50% 100%)}
+  .toc-group.g-deploy .dot{background:var(--deploy)}
+  .toc-group.g-gap .dot{background:var(--gap)}
+  .toc-group.g-flow .dot{background:var(--flow)}
+
+  /* floating controls */
+  .fab-toc{position:fixed;left:18px;bottom:20px;z-index:70;display:none;align-items:center;gap:7px;
+    background:var(--flow);color:#fff;border:none;border-radius:999px;padding:11px 17px;font-size:13px;font-weight:800;
+    box-shadow:0 6px 20px rgba(28,126,214,.42);cursor:pointer;font-family:inherit}
+  .fab-toc:active{transform:translateY(1px)}
+  .totop{position:fixed;right:18px;bottom:20px;z-index:70;width:44px;height:44px;border-radius:12px;
+    background:var(--card);color:var(--ink);border:1px solid var(--line);box-shadow:var(--shadow);cursor:pointer;
+    display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transform:translateY(10px);
+    transition:opacity .2s,transform .2s,visibility .2s}
+  .totop:hover{border-color:var(--flow);color:var(--flow)}
+  .totop.show{opacity:1;visibility:visible;transform:none}
+  .scrim{position:fixed;inset:0;background:rgba(14,34,51,.42);z-index:55;opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s}
+  .scrim.show{opacity:1;visibility:visible}
 
   /* header */
   .eyebrow{font-size:12px;font-weight:700;letter-spacing:2.4px;text-transform:uppercase;color:var(--flow);margin-bottom:12px}
@@ -50,14 +114,6 @@
     border:1px solid var(--line);border-left:3px solid var(--flow);border-radius:10px;padding:14px 17px;box-shadow:var(--shadow)}
   .status b{color:var(--ink)}
   .status code{font-family:var(--mono);font-size:12.5px;background:#eef3f8;padding:1px 6px;border-radius:5px;color:#284b6b}
-
-  /* toc */
-  .toc{display:flex;flex-wrap:wrap;gap:6px;margin:16px 0 4px}
-  .toc a{font-size:11.5px;font-weight:700;color:var(--ink-2);background:var(--card);border:1px solid var(--line);
-    border-radius:7px;padding:4px 10px;text-decoration:none;box-shadow:var(--shadow);transition:.15s}
-  .toc a:hover{border-color:var(--flow);color:var(--flow)}
-  .toc a.l{border-left:3px solid var(--live)} .toc a.b{border-left:3px solid var(--bomb)}
-  .toc a.f{border-left:3px solid var(--fund)} .toc a.d{border-left:3px solid var(--deploy)} .toc a.g{border-left:3px solid var(--gap)}
 
   h2.sec{font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--muted);
     margin:40px 0 14px;padding-top:24px;border-top:1px solid var(--line);scroll-margin-top:16px}
@@ -164,9 +220,25 @@
     .fix,.wave,table,ul.clean,.codewrap,.gate{animation:rise .5s ease both}
     @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
   }
-  @media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} }
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    .sidebar,.totop,.scrim{transition:none}
+  }
+
+  /* ===== 移动端：侧栏收为抽屉 ===== */
+  @media (max-width:940px){
+    .layout{display:block;max-width:100%}
+    .sidebar{position:fixed;top:0;left:0;bottom:0;height:100%;width:min(86vw,330px);z-index:60;
+      border-right:1px solid var(--line);box-shadow:0 0 44px rgba(14,34,51,.28);
+      transform:translateX(-102%);transition:transform .28s ease;will-change:transform}
+    .sidebar.open{transform:none}
+    .sidebar-scroll{padding:20px 15px 40px 20px}
+    .sidebar-close{display:flex}
+    .fab-toc{display:inline-flex}
+    .wrap{max-width:100%;padding:26px 17px 72px}
+  }
   @media (max-width:680px){
-    body{padding:26px 14px 52px}
+    .wrap{padding:22px 13px 72px}
     .wave .w{grid-template-columns:1fr}
     table{font-size:12px} th,td{padding:8px 9px}
     pre.code{font-size:11px}
@@ -174,16 +246,67 @@
   @media print{
     body{background:#fff;padding:0;font-size:12px}
     *{animation:none!important;box-shadow:none!important}
-    .toc{display:none}
+    .layout{display:block}
+    .sidebar,.fab-toc,.totop,.scrim{display:none!important}
+    .wrap{max-width:100%;padding:0}
     .fix,.wave,.codewrap,.evi,.gate,table,.case{break-inside:avoid}
     a{color:var(--ink);text-decoration:none}
   }
 </style>
 </head>
 <body>
-<div class="wrap">
+<div class="layout">
 
-  <div class="eyebrow">悦轻荷供应链 · 资金中台 · 内部技术版</div>
+  <aside class="sidebar" id="sidebar" aria-label="侧边章节导航">
+    <div class="sidebar-scroll">
+      <div class="sidebar-hd">
+        <div>
+          <div class="toc-brand">目录 · Navigation</div>
+          <div class="toc-title">支付后链路 · 详细修复方案</div>
+        </div>
+        <button class="sidebar-close" id="sbClose" type="button" aria-label="关闭目录">✕</button>
+      </div>
+      <nav id="toc" aria-label="章节目录">
+        <a class="toc-link" href="#top">概览 · 现状一句话</a>
+        <a class="toc-link" href="#matrix">灰度开关矩阵</a>
+        <a class="toc-link" href="#overview">缺陷分级总览</a>
+
+        <div class="toc-group g-live"><span class="dot"></span>当前活跃 · 优先止血</div>
+        <a class="toc-link lv-live" href="#fix-1"><span class="d"></span>FIX-1 流水号重号 NPE</a>
+        <a class="toc-link lv-live" href="#fix-7"><span class="d"></span>FIX-7 T+N 少记/漏记</a>
+
+        <div class="toc-group g-bomb"><span class="dot"></span>启用后引爆 · 必修</div>
+        <a class="toc-link lv-bomb" href="#fix-2"><span class="d"></span>FIX-2 outbox 丢失</a>
+        <a class="toc-link lv-bomb" href="#fix-3"><span class="d"></span>FIX-3 记账假失败</a>
+        <a class="toc-link lv-fund" href="#fix-4"><span class="d"></span>FIX-4 出款 success</a>
+        <a class="toc-link lv-fund" href="#fix-5"><span class="d"></span>FIX-5 提现事务失效</a>
+        <a class="toc-link lv-fund" href="#fix-6"><span class="d"></span>FIX-6 多账户口径</a>
+
+        <div class="toc-group g-deploy"><span class="dot"></span>部署 · 重发即解</div>
+        <a class="toc-link lv-deploy" href="#fix-8"><span class="d"></span>FIX-8 会员开户 404</a>
+
+        <div class="toc-group g-gap"><span class="dot"></span>缺口 · 启用配套</div>
+        <a class="toc-link lv-gap" href="#fix-9"><span class="d"></span>FIX-9 网关 stub</a>
+        <a class="toc-link lv-gap" href="#fix-10"><span class="d"></span>FIX-10 前端/菜单/DB</a>
+
+        <div class="toc-group g-flow"><span class="dot"></span>骨架 · 实施 · 验收</div>
+        <a class="toc-link" href="#appendix">附录 A · FIX-1 代码骨架</a>
+        <a class="toc-link sub" href="#a1">A.1 · Redis INCR（推荐）</a>
+        <a class="toc-link sub" href="#a2">A.2 · 雪花（备选）</a>
+        <a class="toc-link sub" href="#a3">A.3 · 推荐结论</a>
+        <a class="toc-link sub" href="#a4">A.4 · insertOrReuse</a>
+        <a class="toc-link sub" href="#a5">A.5 · 调用方判空</a>
+        <a class="toc-link sub" href="#a6">A.6 · 失败用例 16</a>
+        <a class="toc-link" href="#enable">启用前置配置</a>
+        <a class="toc-link" href="#waves">实施 · 三波编排</a>
+        <a class="toc-link" href="#gate">验收 Gate · 待确认</a>
+      </nav>
+    </div>
+  </aside>
+
+  <main class="wrap">
+
+  <div class="eyebrow" id="top">悦轻荷供应链 · 资金中台 · 内部技术版</div>
   <h1>支付后链路 · 详细修复方案<br><span class="thin">从活雷止血到真实分账启用的分波实施与代码级骨架</span></h1>
   <div class="meta">
     <span>代码基线 <code>5b2502a4</code></span>
@@ -207,24 +330,8 @@
     <b>现状一句话：</b>收款（通企付真实支付）四环境全开；<b>收款之后的正式分账与自动出款整条自动化未启用</b>（<code>external-division-enabled=false</code> + <code>default-channel</code> 未配 → 走 <code>OfflineBankImpl</code> 人工兜底）；且链路中埋有<b style="color:#C0392B">当前就可能触发的活雷</b>与<b style="color:#D99400">开关一打开即引爆的休眠雷</b>。本方案按「<b>先止血 → 再补链 → 后启用</b>」编排。全局边界：一切启用/验证在<b>隔离 UAT</b>（禁用 <code>yue_qing_he_uat</code>，用独立测试商户+测试供应商），<b>不在生产直接切开关</b>；每个修复<b>独立提交、带失败用例</b>；渠道幂等未在 UAT 实测前，补偿只查单/转人工，<b>不自动重提</b>。
   </div>
 
-  <nav class="toc" aria-label="目录">
-    <a class="l" href="#fix-1">FIX-1 流水号重号</a>
-    <a class="l" href="#fix-7">FIX-7 T+N 漏记</a>
-    <a class="b" href="#fix-2">FIX-2 outbox 丢失</a>
-    <a class="b" href="#fix-3">FIX-3 记账假失败</a>
-    <a class="f" href="#fix-4">FIX-4 出款 success</a>
-    <a class="f" href="#fix-5">FIX-5 提现事务</a>
-    <a class="f" href="#fix-6">FIX-6 多账户口径</a>
-    <a class="d" href="#fix-8">FIX-8 会员 404</a>
-    <a class="g" href="#fix-9">FIX-9 网关 stub</a>
-    <a class="g" href="#fix-10">FIX-10 前端/菜单/DB</a>
-    <a href="#appendix">附录 A · FIX-1 代码骨架</a>
-    <a href="#enable">启用前置配置</a>
-    <a href="#waves">三波实施</a>
-  </nav>
-
   <!-- ============ 灰度开关矩阵 ============ -->
-  <h2 class="sec">灰度开关矩阵 · 真实值<span class="sub">Codex + 取证D 双方核实一致 · 行号来自只读取证，实施以实际代码为准</span></h2>
+  <h2 class="sec" id="matrix">灰度开关矩阵 · 真实值<span class="sub">Codex + 取证D 双方核实一致 · 行号来自只读取证，实施以实际代码为准</span></h2>
   <table>
     <tr><th>配置项</th><th>代码默认</th><th>local</th><th>dev</th><th>uat</th><th>prod</th><th>证据</th></tr>
     <tr>
@@ -248,7 +355,7 @@
   </table>
 
   <!-- ============ 缺陷分级总览 ============ -->
-  <h2 class="sec">缺陷分级总览<span class="sub">10 个 FIX · 按触发时机分四档：当前活跃 / 启用后引爆 / 部署 / 缺口</span></h2>
+  <h2 class="sec" id="overview">缺陷分级总览<span class="sub">10 个 FIX · 按触发时机分四档：当前活跃 / 启用后引爆 / 部署 / 缺口</span></h2>
   <table>
     <tr><th>编号</th><th>缺陷</th><th>级别</th><th>触发时机</th><th>文档是否已记</th></tr>
     <tr><td><b>FIX-1</b></td><td>渠道流水号跨节点重号 → 退款/提现路径 NPE</td><td style="color:#C0392B;font-weight:700">🔥 活雷</td><td>当前（退款主链无开关；提现管理端）</td><td>是 M3-A / P1-19</td></tr>
@@ -561,7 +668,7 @@
   </div>
 
   <!-- A.1 -->
-  <h3 style="margin:22px 0 6px;font-size:15.5px;font-weight:800">A.1 · 号源方案一：Redis INCR（推荐）</h3>
+  <h3 id="a1" style="margin:22px 0 6px;font-size:15.5px;font-weight:800">A.1 · 号源方案一：Redis INCR（推荐）</h3>
   <p class="block" style="margin-top:4px">新增 <code>service/channel/no/PaymentChannelNoGenerator.java</code> 接口（<code>nextNo()</code>，失败抛异常、<b>禁止返回 null</b>）+ <code>RedisPaymentChannelNoGenerator</code> 实现：</p>
 
   <div class="codewrap">
@@ -606,17 +713,17 @@ public class RedisPaymentChannelNoGenerator implements PaymentChannelNoGenerator
   </ul>
 
   <!-- A.2 -->
-  <h3 style="margin:22px 0 6px;font-size:15.5px;font-weight:800">A.2 · 号源方案二：雪花（备选）</h3>
+  <h3 id="a2" style="margin:22px 0 6px;font-size:15.5px;font-weight:800">A.2 · 号源方案二：雪花（备选）</h3>
   <p class="block" style="margin-top:4px">新增 <code>SnowflakePaymentChannelNoGenerator</code>（<code>strategy=snowflake</code>）：<code>41 位时间戳 + 5 位 datacenterId + 5 位 workerId + 12 位序列</code>，<code>synchronized nextId()</code>，<b>时钟回拨抛异常关闭</b>，<code>worker-id/datacenter-id</code> 由 StatefulSet ordinal 显式注入（禁止随机/默认 0）。仅适合能可靠分配节点 ID + 监控时钟的部署。</p>
 
   <!-- A.3 -->
-  <h3 style="margin:22px 0 6px;font-size:15.5px;font-weight:800">A.3 · 推荐结论</h3>
+  <h3 id="a3" style="margin:22px 0 6px;font-size:15.5px;font-weight:800">A.3 · 推荐结论</h3>
   <div class="gate" style="background:linear-gradient(180deg,#f2f8fd,#fff);border-color:#cddff0;border-left-color:var(--flow)">
     <b>Redis INCR。</b>仓库已由多租户 starter 间接引入 Redis（yudao-module-yqh-balance/pom.xml:75），单原子计数器、无需维护 worker ID、规避雪花的节点 ID 重复与时钟回拨风险。生产用<b>持久 key + AOF + 主从 + 禁淘汰</b>，保留 DB 唯一索引与三次重试兜底。
   </div>
 
   <!-- A.4 -->
-  <h3 style="margin:22px 0 6px;font-size:15.5px;font-weight:800">A.4 · 统一插入模板 <code style="font-size:14px">insertOrReuse</code></h3>
+  <h3 id="a4" style="margin:22px 0 6px;font-size:15.5px;font-weight:800">A.4 · 统一插入模板 <code style="font-size:14px">insertOrReuse</code></h3>
   <p class="block" style="margin-top:4px">新增错误码 <code>PAYMENT_CHANNEL_TRANSACTION_CREATE_FAILED = 1_040_007_007</code>（ErrorCodeConstants.java）；<code>selectByIdempotencyKey</code> 改为显式带 <code>tenant_id</code>（<code>@TenantIgnore</code> + SQL 显式条件）；catch 回查走独立 <code>PaymentChannelTransactionLookupService</code>（<code>@Transactional(REQUIRES_NEW)</code>）。核心模板四步逻辑：</p>
 
   <ol class="steps" style="--nc:var(--flow)">
@@ -657,7 +764,7 @@ private String generateNo() { return paymentChannelNoGenerator.nextNo(); }</pre>
   <div class="block win"><b>四入口复用 + beforeCollect 关键纠正：</b><code>beforePayout / beforeDivision / beforeRefund / beforeCollect</code> 全部复用该模板（各自 <code>factory</code> 填字段）。<code>beforeCollect</code> 当前（:166-168）对任意冲突 <code>return false</code>，改为返回 <code>outcome.created()</code> —— 真幂等重复 → false；仅 no 碰撞重试成功 → true，<b>不再把号碰撞误判为重复收款</b>。</div>
 
   <!-- A.5 -->
-  <h3 style="margin:22px 0 6px;font-size:15.5px;font-weight:800">A.5 · 三处调用方判空兜底（事务回滚型）</h3>
+  <h3 id="a5" style="margin:22px 0 6px;font-size:15.5px;font-weight:800">A.5 · 三处调用方判空兜底（事务回滚型）</h3>
   <p class="block" style="margin-top:4px">各在解引用前判 null 抛可读业务异常，借外层 <code>@Transactional</code> 回滚：</p>
   <ul class="clean">
     <li><b>提现</b> SupplierWithdrawalServiceImpl.java:234（:237 <code>tx.getId()</code> 前）→ 回滚 status=4/payInitiateTime/channel 更新，提现单退回 status=1 可重试。</li>
@@ -673,7 +780,7 @@ if (tx == null) throw exception(PAYMENT_CHANNEL_TRANSACTION_CREATE_FAILED, <span
   </div>
 
   <!-- A.6 -->
-  <h3 style="margin:22px 0 6px;font-size:15.5px;font-weight:800">A.6 · 失败用例清单（16）</h3>
+  <h3 id="a6" style="margin:22px 0 6px;font-size:15.5px;font-weight:800">A.6 · 失败用例清单（16）</h3>
   <div class="casegrid">
     <div class="case"><span class="n">01</span>Redis 多 pod 同秒 <b>1w 并发</b>无重复</div>
     <div class="case"><span class="n">02</span>超 <b>10w</b> 序号不回绕</div>
@@ -749,7 +856,7 @@ if (tx == null) throw exception(PAYMENT_CHANNEL_TRANSACTION_CREATE_FAILED, <span
   </div>
 
   <!-- ============ 验收 gate + 待确认 ============ -->
-  <h2 class="sec">验收 Gate · 待确认清单<span class="sub">对齐 20260719.md:90-96 M5</span></h2>
+  <h2 class="sec" id="gate">验收 Gate · 待确认清单<span class="sub">对齐 20260719.md:90-96 M5</span></h2>
   <div class="gate">
     <b>验收 Gate：</b>UAT 小额真实分账回调 SUCCESS → 本地入账；回调重投/查单并发不重复入账；多 pod 无重号无 NPE；outbox 丢失进人工不无限查单；记账失败可重试自愈；目标单测 + <code>mvn -pl yudao-module-yqh-balance test</code> + 全量 package 通过。
   </div>
@@ -768,6 +875,105 @@ if (tx == null) throw exception(PAYMENT_CHANNEL_TRANSACTION_CREATE_FAILED, <span
     行号来自只读取证，实施以实际代码为准 · 内部研判材料，请勿外传
   </footer>
 
+  </main>
 </div>
+
+<div class="scrim" id="scrim"></div>
+<button class="fab-toc" id="fabToc" type="button" aria-label="打开目录" aria-controls="sidebar" aria-expanded="false">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>目录
+</button>
+<button class="totop" id="toTop" type="button" aria-label="回到顶部" title="回到顶部">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M6 11l6-6 6 6"/></svg>
+</button>
+
+<script>
+(function(){
+  var toc = document.getElementById('toc');
+  var sidebar = document.getElementById('sidebar');
+  var scrim = document.getElementById('scrim');
+  var fab = document.getElementById('fabToc');
+  var closeBtn = document.getElementById('sbClose');
+  var toTop = document.getElementById('toTop');
+  var scroller = document.querySelector('.sidebar-scroll');
+  if(!toc) return;
+  var links = Array.prototype.slice.call(toc.querySelectorAll('.toc-link'));
+
+  // 建立 id -> link 映射与目标元素文档顺序列表
+  var map = {}, targets = [];
+  links.forEach(function(l){
+    var id = (l.getAttribute('href') || '').replace('#','');
+    var el = id && document.getElementById(id);
+    if(el){ map[id] = l; targets.push(el); }
+  });
+
+  // ===== 移动端抽屉 =====
+  var mq = window.matchMedia('(max-width:940px)');
+  function openDrawer(){
+    sidebar.classList.add('open'); scrim.classList.add('show');
+    if(fab) fab.setAttribute('aria-expanded','true');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeDrawer(){
+    sidebar.classList.remove('open'); scrim.classList.remove('show');
+    if(fab) fab.setAttribute('aria-expanded','false');
+    document.body.style.overflow = '';
+  }
+  if(fab) fab.addEventListener('click', openDrawer);
+  if(scrim) scrim.addEventListener('click', closeDrawer);
+  if(closeBtn) closeBtn.addEventListener('click', closeDrawer);
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeDrawer(); });
+  links.forEach(function(l){
+    l.addEventListener('click', function(){ if(mq.matches) setTimeout(closeDrawer, 60); });
+  });
+
+  // ===== 回到顶部 =====
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  function onScroll(){
+    if(window.pageYOffset > window.innerHeight * 0.9) toTop.classList.add('show');
+    else toTop.classList.remove('show');
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+  toTop.addEventListener('click', function(){
+    window.scrollTo({top:0, behavior: reduceMotion ? 'auto' : 'smooth'});
+  });
+
+  // ===== scrollspy 高亮 =====
+  function ensureVisible(link){
+    if(!scroller) return;
+    var lr = link.getBoundingClientRect(), sr = scroller.getBoundingClientRect();
+    if(lr.top < sr.top + 6) scroller.scrollTop -= (sr.top + 6 - lr.top);
+    else if(lr.bottom > sr.bottom - 6) scroller.scrollTop += (lr.bottom - (sr.bottom - 6));
+  }
+  var activeLink = null;
+  function setActive(id){
+    var l = map[id];
+    if(!l || l === activeLink) return;
+    if(activeLink){ activeLink.classList.remove('active'); activeLink.removeAttribute('aria-current'); }
+    l.classList.add('active'); l.setAttribute('aria-current','true');
+    activeLink = l;
+    ensureVisible(l);
+  }
+  if('IntersectionObserver' in window && targets.length){
+    var visible = {};
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting) visible[e.target.id] = true; else delete visible[e.target.id];
+      });
+      for(var i=0;i<targets.length;i++){
+        if(visible[targets[i].id]){ setActive(targets[i].id); return; }
+      }
+    }, {rootMargin:'0px 0px -68% 0px', threshold:0});
+    targets.forEach(function(t){ io.observe(t); });
+  } else {
+    // 兜底：无 IO 时按滚动位置粗略高亮
+    window.addEventListener('scroll', function(){
+      var y = window.pageYOffset + 120, cur = targets[0];
+      for(var i=0;i<targets.length;i++){ if(targets[i].offsetTop <= y) cur = targets[i]; }
+      if(cur) setActive(cur.id);
+    }, {passive:true});
+  }
+})();
+</script>
 </body>
 </html>
