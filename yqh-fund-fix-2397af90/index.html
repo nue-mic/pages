@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>支付后链路 · 详细修复方案（内部技术版）</title>
+<meta name="description" content="悦轻荷供应链资金中台 · 支付后链路详细修复方案（内部技术版）：10 个 FIX 分级、灰度开关矩阵、FIX-1 代码级实现骨架、三波实施与验收 gate。基线 5b2502a4 / 2026-07-22。" />
+<meta name="robots" content="noindex,nofollow" />
+<style>
+  :root{
+    --ink:#0E2233; --ink-2:#33485c; --muted:#5B7085;
+    --bg:#EAEFF4; --card:#FFFFFF; --line:#D5DEE7;
+    --flow:#1C7ED6;
+    --live:#C0392B;    /* 活雷 */
+    --bomb:#D99400;    /* 休眠雷 */
+    --fund:#D6455D;    /* 资金安全 */
+    --deploy:#1C7ED6;  /* 部署 */
+    --gap:#5B7085;     /* 缺口 */
+    --ok:#1E9E6A;
+    --shadow:0 1px 2px rgba(14,34,51,.06), 0 8px 24px rgba(14,34,51,.07);
+    --font:"Segoe UI Variable Display","Segoe UI","PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;
+    --mono:"Cascadia Code","JetBrains Mono","Consolas",ui-monospace,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--font);color:var(--ink);line-height:1.55;letter-spacing:.1px;
+    background:radial-gradient(1100px 560px at 82% -8%,#F3F7FB 0%,transparent 60%),var(--bg);
+    padding:40px 22px 72px}
+  .wrap{max-width:1040px;margin:0 auto}
+  a{color:var(--flow)}
+
+  /* header */
+  .eyebrow{font-size:12px;font-weight:700;letter-spacing:2.4px;text-transform:uppercase;color:var(--flow);margin-bottom:12px}
+  h1{font-size:clamp(26px,4.1vw,39px);font-weight:800;line-height:1.12;letter-spacing:-.5px}
+  h1 .thin{font-weight:400;color:var(--ink-2)}
+  .meta{margin-top:16px;display:flex;flex-wrap:wrap;gap:9px 20px;font-size:13px;color:var(--muted)}
+  .meta b{color:var(--ink);font-weight:700}
+  .meta code{font-family:var(--mono);font-size:12px;background:#eef3f8;padding:1px 6px;border-radius:5px;color:#284b6b}
+  .trio{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px}
+  .trio .t{display:inline-flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--line);
+    border-radius:999px;padding:6px 13px;font-size:12.5px;font-weight:600;color:var(--ink-2);box-shadow:var(--shadow)}
+  .trio .t b{color:var(--ink)}
+
+  .confidential{margin-top:18px;display:flex;align-items:center;gap:10px;font-size:12.5px;font-weight:700;
+    color:#8a2318;background:linear-gradient(90deg,#fdece9,#fff);border:1px solid #f2c9c1;
+    border-left:3px solid var(--live);border-radius:9px;padding:10px 14px}
+  .confidential svg{flex:none}
+
+  .status{margin:16px 0 8px;font-size:14.5px;color:var(--ink-2);background:linear-gradient(180deg,#fff,#fbfdff);
+    border:1px solid var(--line);border-left:3px solid var(--flow);border-radius:10px;padding:14px 17px;box-shadow:var(--shadow)}
+  .status b{color:var(--ink)}
+  .status code{font-family:var(--mono);font-size:12.5px;background:#eef3f8;padding:1px 6px;border-radius:5px;color:#284b6b}
+
+  /* toc */
+  .toc{display:flex;flex-wrap:wrap;gap:6px;margin:16px 0 4px}
+  .toc a{font-size:11.5px;font-weight:700;color:var(--ink-2);background:var(--card);border:1px solid var(--line);
+    border-radius:7px;padding:4px 10px;text-decoration:none;box-shadow:var(--shadow);transition:.15s}
+  .toc a:hover{border-color:var(--flow);color:var(--flow)}
+  .toc a.l{border-left:3px solid var(--live)} .toc a.b{border-left:3px solid var(--bomb)}
+  .toc a.f{border-left:3px solid var(--fund)} .toc a.d{border-left:3px solid var(--deploy)} .toc a.g{border-left:3px solid var(--gap)}
+
+  h2.sec{font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--muted);
+    margin:40px 0 14px;padding-top:24px;border-top:1px solid var(--line);scroll-margin-top:16px}
+  .sec .sub{display:block;margin-top:5px;font-size:13px;font-weight:500;letter-spacing:.2px;text-transform:none;color:var(--ink-2)}
+
+  /* tables */
+  table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);
+    border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:13px}
+  th,td{padding:10px 13px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:#f4f7fa;font-weight:700;color:var(--ink);font-size:12px;letter-spacing:.3px}
+  tr:last-child td{border-bottom:none}
+  td code,.status code,.block code,.step-note code{font-family:var(--mono);font-size:12px;background:#eef3f8;padding:1px 6px;border-radius:5px;color:#284b6b;word-break:break-word}
+  .off{color:var(--live);font-weight:700}
+  .on{color:var(--ok);font-weight:700}
+  table.mini{font-size:12.5px;margin:10px 0}
+  table.mini th,table.mini td{padding:8px 11px}
+
+  /* group headers */
+  .grp{display:flex;align-items:center;gap:10px;margin:30px 0 12px;font-size:15px;font-weight:800;scroll-margin-top:16px}
+  .grp .pill{font-size:11px;font-weight:800;letter-spacing:.4px;padding:3px 10px;border-radius:999px;color:#fff}
+  .grp .sub{font-weight:500;font-size:12.5px;color:var(--muted)}
+  .g-live .pill{background:var(--live)} .g-bomb .pill{background:var(--bomb)}
+  .g-deploy .pill{background:var(--deploy)} .g-gap .pill{background:var(--gap)}
+
+  /* fix cards */
+  .fix{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:17px 19px;margin:13px 0;
+    box-shadow:var(--shadow);border-left:4px solid var(--nc,var(--flow));scroll-margin-top:16px}
+  .fix .top{display:flex;flex-wrap:wrap;gap:9px 12px;align-items:center;justify-content:space-between}
+  .fix h3{font-size:16.5px;font-weight:750;letter-spacing:-.2px}
+  .fix h3 .id{font-family:var(--mono);font-size:13px;color:var(--nc,var(--flow));margin-right:8px;font-weight:800}
+  .badge{font-size:11px;font-weight:800;letter-spacing:.4px;padding:4px 11px;border-radius:999px;white-space:nowrap;color:#fff;background:var(--nc,var(--flow))}
+  .fixmeta{margin-top:8px;display:flex;flex-wrap:wrap;gap:6px 8px}
+  .fixmeta .m{font-size:11.5px;font-weight:650;color:var(--ink-2);background:#f4f7fa;border:1px solid var(--line);border-radius:6px;padding:3px 9px}
+  .fixmeta .m b{color:var(--ink)}
+
+  .block{margin-top:11px;font-size:13.4px;color:var(--ink-2);line-height:1.66}
+  .block > .lbl{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.9px;text-transform:uppercase;
+    color:#fff;background:var(--nc,var(--flow));border-radius:5px;padding:2px 8px;margin-right:8px;vertical-align:1.5px}
+  .block b{color:var(--ink);font-weight:700}
+  .block.win{background:#fbfdff;border:1px dashed var(--line);border-radius:9px;padding:9px 12px}
+
+  ol.steps{list-style:none;counter-reset:s;margin:6px 0 0}
+  ol.steps li{position:relative;padding:8px 0 8px 32px;font-size:13.3px;color:var(--ink-2);line-height:1.62;border-bottom:1px dashed var(--line)}
+  ol.steps li:last-child{border-bottom:none}
+  ol.steps li::before{counter-increment:s;content:counter(s);position:absolute;left:0;top:8px;
+    width:21px;height:21px;border-radius:6px;background:var(--nc,var(--flow));color:#fff;
+    font-family:var(--mono);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center}
+  ol.steps li b{color:var(--ink);font-weight:700}
+  ol.steps li .path{font-family:var(--mono);font-size:11.6px;color:#284b6b}
+
+  /* evidence panel */
+  .evi{margin-top:11px;border:1px solid var(--line);border-radius:9px;background:#f8fbfe;overflow:hidden}
+  .evi > .h{font-size:10.5px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;color:var(--muted);
+    background:#eef3f8;padding:6px 12px;border-bottom:1px solid var(--line)}
+  .evi ul{list-style:none;padding:8px 12px}
+  .evi li{font-family:var(--mono);font-size:11.6px;color:#284b6b;line-height:1.7;padding:2px 0 2px 15px;position:relative;word-break:break-all}
+  .evi li::before{content:"›";position:absolute;left:0;color:var(--flow);font-weight:800}
+  .evi li b{color:var(--ink);font-family:var(--font);font-weight:700;letter-spacing:.2px}
+
+  /* code panel */
+  .codewrap{margin:13px 0;border:1px solid #cdd8e3;border-radius:10px;overflow:hidden;box-shadow:var(--shadow)}
+  .codewrap > .ch{display:flex;align-items:center;gap:8px;background:#e9f0f6;border-bottom:1px solid #cdd8e3;
+    padding:7px 13px;font-family:var(--mono);font-size:11.5px;color:var(--ink-2);font-weight:700}
+  .codewrap > .ch .dot{width:9px;height:9px;border-radius:50%;background:#c3d0dd;flex:none}
+  .codewrap > .ch .lang{margin-left:auto;font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);font-weight:800}
+  pre.code{margin:0;padding:14px 16px;background:#fbfdff;overflow-x:auto;
+    font-family:var(--mono);font-size:12px;line-height:1.75;color:#22384a;white-space:pre;tab-size:2;-moz-tab-size:2}
+  pre.code .c{color:#6b8299;font-style:italic}   /* 注释 */
+  pre.code .s{color:#1E9E6A}                       /* 字符串/字面量 */
+  pre.code .k{color:#1C7ED6;font-weight:600}       /* 关键字 */
+
+  ul.clean{list-style:none;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 8px;box-shadow:var(--shadow)}
+  ul.clean li{padding:9px 12px;font-size:13px;color:var(--ink-2);border-bottom:1px solid var(--line);line-height:1.6}
+  ul.clean li:last-child{border-bottom:none}
+  ul.clean li b{color:var(--ink)}
+  ul.clean li code{font-family:var(--mono);font-size:12px;background:#eef3f8;padding:1px 6px;border-radius:5px;color:#284b6b}
+
+  /* case grid (16 用例) */
+  .casegrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:9px;margin-top:10px}
+  .case{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--ok);border-radius:9px;
+    padding:9px 11px;font-size:12.3px;color:var(--ink-2);box-shadow:var(--shadow);line-height:1.5}
+  .case .n{font-family:var(--mono);font-size:10.5px;font-weight:800;color:var(--ok);margin-right:6px}
+  .case b{color:var(--ink)}
+
+  /* timeline */
+  .wave{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:6px 18px 16px;box-shadow:var(--shadow)}
+  .wave .w{display:grid;grid-template-columns:132px 1fr;gap:14px;padding:15px 0;border-bottom:1px solid var(--line);align-items:start}
+  .wave .w:last-child{border-bottom:none}
+  .wave .lab{font-weight:800;font-size:14px}
+  .wave .lab .n{display:block;font-family:var(--mono);font-size:11px;color:var(--muted);font-weight:600;margin-top:2px}
+  .chips{display:flex;flex-wrap:wrap;gap:7px}
+  .chip{font-size:12px;font-weight:650;color:var(--ink-2);background:#fff;border:1px solid var(--line);border-radius:8px;padding:5px 10px}
+  .chip.l{border-left:3px solid var(--live)} .chip.b{border-left:3px solid var(--bomb)}
+  .chip.f{border-left:3px solid var(--fund)} .chip.d{border-left:3px solid var(--deploy)} .chip.g{border-left:3px solid var(--gap)}
+
+  .gate{margin-top:12px;background:linear-gradient(180deg,#f4faf6,#fff);border:1px solid #cfe6d8;border-left:3px solid var(--ok);
+    border-radius:12px;padding:14px 17px;font-size:13.4px;color:var(--ink-2);line-height:1.66;box-shadow:var(--shadow)}
+  .gate b{color:var(--ink)}
+  .gate code{font-family:var(--mono);font-size:12px;background:#e7f3ec;padding:1px 6px;border-radius:5px;color:#1a6b47}
+
+  footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--line);font-size:11.5px;color:var(--muted);text-align:center;line-height:1.7}
+
+  @media (prefers-reduced-motion:no-preference){
+    .fix,.wave,table,ul.clean,.codewrap,.gate{animation:rise .5s ease both}
+    @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  }
+  @media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} }
+  @media (max-width:680px){
+    body{padding:26px 14px 52px}
+    .wave .w{grid-template-columns:1fr}
+    table{font-size:12px} th,td{padding:8px 9px}
+    pre.code{font-size:11px}
+  }
+  @media print{
+    body{background:#fff;padding:0;font-size:12px}
+    *{animation:none!important;box-shadow:none!important}
+    .toc{display:none}
+    .fix,.wave,.codewrap,.evi,.gate,table,.case{break-inside:avoid}
+    a{color:var(--ink);text-decoration:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">悦轻荷供应链 · 资金中台 · 内部技术版</div>
+  <h1>支付后链路 · 详细修复方案<br><span class="thin">从活雷止血到真实分账启用的分波实施与代码级骨架</span></h1>
+  <div class="meta">
+    <span>代码基线 <code>5b2502a4</code></span>
+    <span>分支 <code>main</code></span>
+    <span>日期 <b>2026-07-22</b></span>
+    <span>范围 <b>收款 → 分账 → 提现 全链路</b></span>
+    <span>取证 <b>4 路只读走查 + 1 路 Codex 独立诊断</b></span>
+  </div>
+  <div class="trio">
+    <span class="t">🧠 <b>Claude</b> 方案设计 / 集成</span>
+    <span class="t">⚙️ <b>Codex</b> 独立诊断 / 代码级实现</span>
+    <span class="t">🎨 <b>Antigravity</b> UI 设计 / 排版</span>
+  </div>
+
+  <div class="confidential">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8a2318" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    内部技术版 · 含代码路径 / 行号 / 资金链路缺陷细节，仅限内部研判，请勿外传或索引。
+  </div>
+
+  <div class="status">
+    <b>现状一句话：</b>收款（通企付真实支付）四环境全开；<b>收款之后的正式分账与自动出款整条自动化未启用</b>（<code>external-division-enabled=false</code> + <code>default-channel</code> 未配 → 走 <code>OfflineBankImpl</code> 人工兜底）；且链路中埋有<b style="color:#C0392B">当前就可能触发的活雷</b>与<b style="color:#D99400">开关一打开即引爆的休眠雷</b>。本方案按「<b>先止血 → 再补链 → 后启用</b>」编排。全局边界：一切启用/验证在<b>隔离 UAT</b>（禁用 <code>yue_qing_he_uat</code>，用独立测试商户+测试供应商），<b>不在生产直接切开关</b>；每个修复<b>独立提交、带失败用例</b>；渠道幂等未在 UAT 实测前，补偿只查单/转人工，<b>不自动重提</b>。
+  </div>
+
+  <nav class="toc" aria-label="目录">
+    <a class="l" href="#fix-1">FIX-1 流水号重号</a>
+    <a class="l" href="#fix-7">FIX-7 T+N 漏记</a>
+    <a class="b" href="#fix-2">FIX-2 outbox 丢失</a>
+    <a class="b" href="#fix-3">FIX-3 记账假失败</a>
+    <a class="f" href="#fix-4">FIX-4 出款 success</a>
+    <a class="f" href="#fix-5">FIX-5 提现事务</a>
+    <a class="f" href="#fix-6">FIX-6 多账户口径</a>
+    <a class="d" href="#fix-8">FIX-8 会员 404</a>
+    <a class="g" href="#fix-9">FIX-9 网关 stub</a>
+    <a class="g" href="#fix-10">FIX-10 前端/菜单/DB</a>
+    <a href="#appendix">附录 A · FIX-1 代码骨架</a>
+    <a href="#enable">启用前置配置</a>
+    <a href="#waves">三波实施</a>
+  </nav>
+
+  <!-- ============ 灰度开关矩阵 ============ -->
+  <h2 class="sec">灰度开关矩阵 · 真实值<span class="sub">Codex + 取证D 双方核实一致 · 行号来自只读取证，实施以实际代码为准</span></h2>
+  <table>
+    <tr><th>配置项</th><th>代码默认</th><th>local</th><th>dev</th><th>uat</th><th>prod</th><th>证据</th></tr>
+    <tr>
+      <td><code>yqh.balance.division.external-division-enabled</code></td>
+      <td class="off">false</td>
+      <td class="off">未配→false</td><td class="off">未配→false</td><td class="off">未配→false</td><td class="off">未配→false</td>
+      <td><code>ConsignPayableDueJob.java:37</code></td>
+    </tr>
+    <tr>
+      <td><code>yqh.balance.payment-channel.default-channel</code></td>
+      <td class="off">无（<code>matchIfMissing</code>→OFFLINE_BANK）</td>
+      <td class="off">未配</td><td class="off">未配</td><td class="off">未配</td><td class="off">未配</td>
+      <td><code>OfflineBankImpl.java:44</code>、<code>TppayPaymentChannelGateway.java:54</code></td>
+    </tr>
+    <tr>
+      <td><code>yqh.pay.tppay.real-pay-enabled</code>（收款，非分账）</td>
+      <td class="on">true</td>
+      <td class="on">true</td><td class="on">true</td><td class="on">true</td><td class="on">true</td>
+      <td><code>PayProperties.java:69</code>、<code>application-*.yaml</code></td>
+    </tr>
+  </table>
+
+  <!-- ============ 缺陷分级总览 ============ -->
+  <h2 class="sec">缺陷分级总览<span class="sub">10 个 FIX · 按触发时机分四档：当前活跃 / 启用后引爆 / 部署 / 缺口</span></h2>
+  <table>
+    <tr><th>编号</th><th>缺陷</th><th>级别</th><th>触发时机</th><th>文档是否已记</th></tr>
+    <tr><td><b>FIX-1</b></td><td>渠道流水号跨节点重号 → 退款/提现路径 NPE</td><td style="color:#C0392B;font-weight:700">🔥 活雷</td><td>当前（退款主链无开关；提现管理端）</td><td>是 M3-A / P1-19</td></tr>
+    <tr><td><b>FIX-7</b></td><td>T+N 结算「先翻成功再少记/漏记」不可重试</td><td style="color:#C0392B;font-weight:700">🔥 潜在活跃</td><td>当前（旧 settleDueBatch）</td><td>否（Codex 新发现）</td></tr>
+    <tr><td><b>FIX-2</b></td><td>分账 outbox 内存事件丢失 + 查单 Job 无限查单卡死</td><td style="color:#D99400;font-weight:700">💣 休眠雷</td><td>开真实分账后</td><td>是 M3-B / 0715 §15.3.2</td></tr>
+    <tr><td><b>FIX-3</b></td><td>记账并发「假失败」且人工重试不可自愈</td><td style="color:#D99400;font-weight:700">💣 休眠雷</td><td>开真实分账后</td><td>否（新缺陷）</td></tr>
+    <tr><td><b>FIX-4</b></td><td>提现 <code>success=false</code> 被无条件当成功</td><td style="color:#D6455D;font-weight:700">💰 资金安全</td><td>自动出款接入后</td><td>否（Codex 新发现）</td></tr>
+    <tr><td><b>FIX-5</b></td><td>提现监听器自调用 payFinalize，@Transactional 失效</td><td style="color:#D6455D;font-weight:700">💰 一致性</td><td>出款/回调落库</td><td>否（Codex 新发现）</td></tr>
+    <tr><td><b>FIX-6</b></td><td>037 多账户 pending 与外部分账入账口径冲突</td><td style="color:#D6455D;font-weight:700">💰 账账不一致</td><td>多账户 + 开真实分账</td><td>否（Codex 新发现）</td></tr>
+    <tr><td><b>FIX-8</b></td><td>通企付会员开户线上 404</td><td style="color:#1C7ED6;font-weight:700">🚧 部署</td><td>当前线上</td><td>是（部署滞后）</td></tr>
+    <tr><td><b>FIX-9</b></td><td>网关 <code>cancelDivision</code> / <code>payout</code> stub 待接入</td><td style="color:#5B7085;font-weight:700">🧩 缺口</td><td>启用撤销/出款前</td><td>是（接口有出处）</td></tr>
+    <tr><td><b>FIX-10</b></td><td>前端两工作台页 + 菜单权限 seed + fresh_db 037 未落</td><td style="color:#5B7085;font-weight:700">🧩 缺口</td><td>启用前</td><td>是 M1/M2</td></tr>
+  </table>
+
+  <!-- ============ 当前活跃 ============ -->
+  <div class="grp g-live"><span class="pill">当前活跃</span> <span class="sub">现在就可能触发，优先止血</span></div>
+
+  <!-- FIX-1 -->
+  <div class="fix" id="fix-1" style="--nc:var(--live)">
+    <div class="top"><h3><span class="id">FIX-1</span>渠道流水号跨节点重号 → NPE</h3><span class="badge">🔥 活雷</span></div>
+    <div class="fixmeta"><span class="m"><b>触发：</b>当前（退款主链无开关；提现管理端）</span><span class="m"><b>取证：</b>取证A + Codex</span><span class="m"><b>关联：</b>M3-A / P1-19</span></div>
+
+    <div class="block"><span class="lbl">问题</span><code>generateNo()</code> = <code>PCT-{yyyyMMddHHmmss}-{static AtomicLong % 100000}</code>，<code>SEQ</code> 每 JVM 从 0 起；多 pod / 滚动发布同秒生成相同 <code>no</code>，撞唯一键 <code>uk_tenant_no</code>。各 <code>beforeXxx</code> 的 <code>catch(DuplicateKeyException)</code> 一律按 <code>idempotency_key</code> 回查，撞的是 <code>no</code>（idempotency_key 其实是新的）时回查落空返回 <b>null</b> → 调用方无判空解引用 → <b>NPE</b>。</div>
+
+    <div class="block"><span class="lbl">根因</span>号源非全局唯一 + catch 把两类唯一键冲突混为一谈 + 调用方无判空。DDL 的 <code>uk_tenant_no(tenant_id,no,deleted)</code> <b>不含 type</b>（号段跨 type 共享），与 <code>uk_idempotency</code> 抛<b>同一</b> <code>DuplicateKeyException</code>，是 catch 无法区分冲突来源的根本原因。</div>
+
+    <div class="evi">
+      <div class="h">证据 · 文件:行（完整保留）</div>
+      <ul>
+        <li><b>号源：</b>PaymentChannelTransactionServiceImpl.java:30-32（NO_FMT + static AtomicLong SEQ）、:253-256（generateNo）</li>
+        <li><b>catch 分支（可能返回 null）：</b>打款 :61-64、分账 :93-94、退款 :126-127、收款 :166-169</li>
+        <li><b>解引用 NPE 点 — 退款（最活，无灰度开关）：</b>SupplierWithdrawalApiImpl.java:200-203 → :207 tx.getId()；由 AfterSaleServiceImpl.java:799 handleRefundIncrement 在售后退款主链调用（幂等键 REFUND:{afterSaleId} :797）</li>
+        <li><b>解引用 NPE 点 — 打款（无开关，活）：</b>SupplierWithdrawalServiceImpl.java:234 → :237 tx.getId()；由管理端 payInitiate 触发</li>
+        <li><b>解引用 NPE 点 — 分账（被 external-division-enabled 门控，休眠）：</b>PaymentDivisionServiceImpl.java:121 → :122 buildDivideRequest → :521 tx.getNo()</li>
+        <li><b>DDL：</b>sql/mysql/yqh_balance_r_alter.sql:194-196 uk_tenant_no(tenant_id,no,deleted) 不含 type、uk_idempotency(tenant_id,idempotency_key,deleted)</li>
+        <li><b>文档：</b>启用真实分账-最小改动清单-20260719.md:53-60（M3-A）、资金链路体检-…20260623.md:129（P1-19）</li>
+      </ul>
+    </div>
+
+    <div class="block"><span class="lbl">修复步骤</span>推荐 <b>A 号源全局唯一 + B 调用方判空</b> 双保险（代码骨架见 <a href="#appendix">附录 A</a>）：</div>
+    <ol class="steps">
+      <li><b>号源改全局唯一</b> — 推荐 Redis <code>INCR</code>：key=<code>pct:seq:{tenant}:{yyyyMMddHHmmss}</code>，跨 pod 严格递增（备选雪花号）。触碰 <span class="path">:30-32、:253-256</span>。</li>
+      <li><b>catch 区分冲突来源</b> — 先 <code>selectByIdempotencyKey</code> 命中→真幂等返回；未命中→判定 <code>no</code> 撞号→重新 <code>generateNo</code> 重试 insert（限 3 次）。触碰四个 catch <span class="path">:61-64 / :93-94 / :126-127 / :166-169</span> + 复用 <code>selectByNo</code>（<span class="path">PaymentChannelTransactionMapper.java:64-68</span>）。</li>
+      <li><b>调用方判空兜底</b> — 三处赋值后、解引用前判 null 并抛可读业务异常/转重试。触碰 <span class="path">SupplierWithdrawalServiceImpl.java:234</span>、<span class="path">SupplierWithdrawalApiImpl.java:200-203</span>、<span class="path">PaymentDivisionServiceImpl.java:121</span>。</li>
+    </ol>
+
+    <div class="block"><span class="lbl">验收</span>多 pod 同秒重号无 NPE、无漏记（M3-A 验收 20260719.md:93）；单测覆盖：同秒重号→重试成功、真幂等短路、调用方判空。</div>
+    <div class="block win"><b>边界：</b>独立提交，与 FIX-2 分开（文档明示）。连带评估 <code>SupplierWithdrawalServiceImpl.generateNo():368-371</code>（<code>WD-</code> 号用 <code>ThreadLocalRandom</code>）同类隐患。</div>
+  </div>
+
+  <!-- FIX-7 -->
+  <div class="fix" id="fix-7" style="--nc:var(--live)">
+    <div class="top"><h3><span class="id">FIX-7</span>T+N 结算「先翻成功再少记/漏记」不可重试</h3><span class="badge">🔥 潜在活跃</span></div>
+    <div class="fixmeta"><span class="m"><b>触发：</b>当前（旧 settleDueBatch 默认路径）</span><span class="m"><b>取证：</b>Codex 新发现</span><span class="m"><b>前置：</b>先 DB 核账</span></div>
+
+    <div class="block"><span class="lbl">问题</span><code>settleDueBatch</code>（当前默认走的旧路径）先把 payable <code>1→2</code>，随后若 <code>cost_price=NULL</code> 只告警跳过、或 supplier pending &lt; 应结金额只按实际 pending 入账并提交、不回滚状态。该 payable 之后不再被只查 <code>status=1</code> 的 Job 选中，且 <code>SETTLE</code> 幂等键阻止补记 → <b>永久少记/漏记，且不可自愈</b>。</div>
+    <div class="block"><span class="lbl">根因</span>状态翻转与金额入账非原子对齐；「成本缺失 / pending 不足」被当可跳过而非可重试。</div>
+
+    <div class="evi">
+      <div class="h">证据 · 文件:行</div>
+      <ul>
+        <li>YqhConsignPayableMapper.java:130（1→2 CAS）</li>
+        <li>ConsignPayableServiceImpl.java:466 / 475 / 477</li>
+        <li>SupplierBalanceServiceImpl.java:109 / 111 / 113</li>
+        <li>FundLedgerServiceImpl.java:61 / 65（SETTLE 幂等短路）</li>
+      </ul>
+    </div>
+
+    <div class="block"><span class="lbl">修复步骤</span></div>
+    <ol class="steps">
+      <li>结算前置校验 <code>cost_price</code> 非空、pending 充足；不满足则<b>不翻状态</b>、落异常清单待人工/下轮重试（而非翻 2 后跳过）。</li>
+      <li>若必须翻状态，改为「<b>入账成功才 CAS 翻 2</b>」的顺序，或引入 <code>settle_status</code> 区分「已翻状态未入账」。</li>
+      <li>补一个「<b>已翻 2 但无对应 SETTLE 分录</b>」的对账/补偿扫描。</li>
+    </ol>
+
+    <div class="block"><span class="lbl">验收</span>构造 <code>cost_price=NULL</code>、pending 不足两用例 → 不产生「状态已结、金额少记且无法补」的单；对账扫描能捞出历史漏记。</div>
+    <div class="block win"><b>边界：</b><b>需先确认是否已有历史漏记数据</b>（DB 核账）再定补偿脚本；此项影响当前在跑的旧结算路径，优先级仅次于 FIX-1。</div>
+  </div>
+
+  <!-- ============ 启用后引爆 ============ -->
+  <div class="grp g-bomb"><span class="pill">启用后引爆</span> <span class="sub">开关一打开即触发，启用真实分账 / 出款前必修</span></div>
+
+  <!-- FIX-2 -->
+  <div class="fix" id="fix-2" style="--nc:var(--bomb)">
+    <div class="top"><h3><span class="id">FIX-2</span>分账 outbox 内存事件丢失 + 查单 Job 无限查单卡死</h3><span class="badge">💣 休眠雷</span></div>
+    <div class="fixmeta"><span class="m"><b>触发：</b>开真实分账后</span><span class="m"><b>取证：</b>取证B + Codex</span><span class="m"><b>关联：</b>M3-B / 0715 §15.3.2 / R-10</span></div>
+
+    <div class="block"><span class="lbl">问题</span><code>submitPayableDivision</code> 事务内 <code>markProcessing</code>（status=1，写 submit_time，不写 response_time/third_party_division_no），AFTER_COMMIT 内存事件 <code>onDivisionInitiated</code> 才真正 <code>divide</code>。commit 后、divide 前进程挂掉 → 事件丢失、永不重放 → 单停 <code>status=1</code> 且 response_time/third_party_division_no 全空。查单 Job <code>selectPendingForQuery</code> 只按 status=1 捞、<b>无超时/未提交过滤</b>，对通企付从没收到的单查单→抛异常被 catch 只 log → <b>每 2 分钟无限查、永不 re-divide、无告警</b>。分账侧无超时兜底 Job（提现侧有 <code>WithdrawalTimeoutJob</code> 可参照）。</div>
+    <div class="block"><span class="lbl">根因</span>divide 触发依赖进程内内存事件（非事务性 outbox）；查单 Job 不区分「已提交渠道待确认」与「仅登记从未提交」。</div>
+
+    <div class="evi">
+      <div class="h">证据 · 文件:行 / 文档</div>
+      <ul>
+        <li>PaymentDivisionServiceImpl.java:121-129（in-tx 登记+发事件）、:368-369（@TransactionalEventListener AFTER_COMMIT）、:397（真正 divide）、:261 / 264-270（查单 + catch 仅 log）</li>
+        <li>PaymentDivisionOrderMapper.java:40-47（selectPendingForQuery 只按 status=1，无时间过滤）、:76-84（markProcessing）、:99-108（markSubmittedResponse 写 response_time+third_party_no → schema 已能区分「仅登记 vs 已提交」）</li>
+        <li>DivisionInitiatedEvent.java:8（内存 record，无持久化）；无 *TimeoutJob（job/division/ 仅 PaymentDivisionQueryJob）；WithdrawalTimeoutJob.java:41 / 59-60 / 73-88（可参照的超时兜底范式）</li>
+        <li>Job seed cron 每 2 分钟：yqh_pay_balance_job_seed.sql:40-43</li>
+        <li>DDL：yqh_tppay_settlement_alter.sql:89（status 0待提交/1处理中/2成功/3失败/4已撤销/5人工）、:118（idx_tenant_status(tenant_id,status,submit_time) 已含 submit_time，支持超时过滤）</li>
+        <li>文档：20260719.md:62-67（M3-B）、支付退款分账资金闭环修复方案-20260715.md:713-714（§15.3.2）、资金链路对抗审计-发现清单-20260626.md:51（R-10 AFTER_COMMIT 失败无重投）、019通企付支付接入/08-…md:161 / 240 / 368-369 / 1554（mchAssureOrderNo 幂等约定）</li>
+      </ul>
+    </div>
+
+    <div class="block"><span class="lbl">修复步骤</span>安全版，配合灰度：</div>
+    <ol class="steps">
+      <li><b>查单 Job 加超时 + 未提交分支</b> — <code>selectPendingForQuery</code> 增 <code>submit_time &lt; now()-N</code> 与 <code>response_time IS NULL AND third_party_division_no IS NULL</code> 过滤；命中「从未提交」→转 <code>PENDING_MANUAL(5)</code> 写明确 reason（进 M1 异常清单人工重发），<b>不自动重提 divide</b>。触碰 <span class="path">PaymentDivisionOrderMapper.java:40-47</span>、<span class="path">PaymentDivisionServiceImpl.java:256-273</span>。</li>
+      <li><b>新增 <code>PaymentDivisionTimeoutJob</code></b> — 仿 <code>WithdrawalTimeoutJob</code>（阈值过滤+回查+转人工）。N 参照提现取 30min（待定）。</li>
+      <li><b>catch 分支补告警/死信</b>（<span class="path">:264-270</span>），不再静默 log。</li>
+      <li><b>UAT 实测 <code>mchAssureOrderNo</code> 幂等通过后</b>，再升级为「扫 status=1+未确认」的事务性 outbox 定时重放（真 re-divide）。</li>
+    </ol>
+
+    <div class="block"><span class="lbl">验收</span>模拟 outbox 丢失 → 单进人工清单、不无限查单（M5-4 20260719.md:94）。</div>
+    <div class="block win"><b>边界：</b>独立提交；re-divide 自动化依赖 UAT 幂等实测（文档边界 20260719.md:13）。<b>待确认：</b>通企付对「从未提交的 mchAssureOrderNo」查询是抛异常还是返回可映射 state。</div>
+  </div>
+
+  <!-- FIX-3 -->
+  <div class="fix" id="fix-3" style="--nc:var(--bomb)">
+    <div class="top"><h3><span class="id">FIX-3</span>记账并发「假失败」且人工重试不可自愈</h3><span class="badge">💣 休眠雷 · 新缺陷</span></div>
+    <div class="fixmeta"><span class="m"><b>触发：</b>开真实分账后</span><span class="m"><b>取证：</b>取证C</span><span class="m"><b>性质：</b>文档反当既定行为</span></div>
+
+    <div class="block"><span class="lbl">问题</span>金额层（uk_idem）安全不双花，但状态层被并发污染成「假失败」且永久钉死。三点联动：<b>(a)</b> 三处成功分支忽略 <code>markSuccess</code> 的 CAS 返回行数，仍无条件 <code>accountDivisionSuccess</code> → 多路径同时入账；<b>(b)</b> <code>markAccountingFailed</code> <b>无 accounting_status 守卫</b>（对比 <code>markAccountingSuccess</code> 有），把已成功(1)覆写回失败(2)；<b>(c)</b> 人工 <code>retryAccounting</code> 因 payable 已在 available、<code>markPayableInAvailable</code> 返回 0 被当硬失败抛 <code>IllegalStateException</code> → 再标失败 → 永久钉死。</div>
+    <div class="block"><span class="lbl">根因</span>CAS 返回值被丢弃（放大器）+ 守卫不对称 + 把「payable 已在目标态」的幂等成功误判为硬失败。</div>
+
+    <div class="evi">
+      <div class="h">证据 · 文件:行</div>
+      <ul>
+        <li>(a) PaymentDivisionServiceImpl.java:426 / 428、:453 / 456、:484 / 486；markSuccess CAS PaymentDivisionOrderMapper.java:121-132（.in(status,0,1,5)）。包装器 PaymentDivisionServiceImpl.java:507-516 无 @Transactional；内层 PaymentDivisionAccountingServiceImpl.java:29 有事务，回滚后 catch :511 的 markAccountingFailed(:513) 在事务外独立提交</li>
+        <li>(b) markAccountingFailed PaymentDivisionOrderMapper.java:179-187（仅 .eq(status,2)）vs markAccountingSuccess :168-177（.eq(status,2)+.in(accountingStatus,0,2)）</li>
+        <li>(c) retryAccounting PaymentDivisionServiceImpl.java:302-324；PaymentDivisionAccountingServiceImpl.java:53-57（markPayableInAvailable 返回 0 抛异常）；ConsignPayableServiceImpl.java:612-618 → YqhConsignPayableMapper.java:117-125（CAS payable_status=1，已被赢家翻 2 → 返 0）</li>
+        <li>金额安全：FundLedgerServiceImpl.java:60-66（首分录幂等短路）、:99-108（撞 uk_idem 整组回滚）</li>
+        <li>文档：019通企付支付接入/08-…md:2080 / 2084 / 2203 / 2223-2225（把 (b)(c) 当既定行为，未识别为缺陷）</li>
+      </ul>
+    </div>
+
+    <div class="block"><span class="lbl">修复步骤</span></div>
+    <ol class="steps">
+      <li><b>调用方检查 CAS 返回</b> — <code>markSuccess</code> 返回 0（并发已抢先置 2）时不再驱动本路径入账；把「谁入账」收敛到单一 CAS 赢家。触碰 <span class="path">:426 / 428、:453 / 456、:484 / 486</span>。</li>
+      <li><b><code>markAccountingFailed</code> 加守卫</b> — 补 <code>.in(accountingStatus,0)</code>（或 <code>.ne(accountingStatus,1)</code>），永不能覆盖已成功。触碰 <span class="path">PaymentDivisionOrderMapper.java:179-187</span>。</li>
+      <li><b>幂等自愈</b> — <code>markPayableInAvailable</code> 返回 0 时回读 payable，若已 <code>payable_status∈{2,已drained}</code> 视为幂等成功继续，仅非法态才抛。触碰 <span class="path">PaymentDivisionAccountingServiceImpl.java:53-57</span>、<span class="path">retryAccounting:319-323</span>。</li>
+    </ol>
+
+    <div class="block"><span class="lbl">验收</span>并发（divide+notify+查单）双入账 → 余额不双加、状态不被标假失败；对已污染单人工 retry 可自愈。</div>
+    <div class="block win"><b>待确认：</b>当前灰度未开、查单 Job 无 Trigger，属开启后潜在；<code>PaymentDivisionAccountingServiceImplTest</code> 现无并发用例。</div>
+  </div>
+
+  <!-- FIX-4 -->
+  <div class="fix" id="fix-4" style="--nc:var(--fund)">
+    <div class="top"><h3><span class="id">FIX-4</span>提现 success=false 被无条件当成功</h3><span class="badge">💰 资金安全 · 新发现</span></div>
+    <div class="fixmeta"><span class="m"><b>触发：</b>自动出款接入后</span><span class="m"><b>取证：</b>Codex 新发现</span><span class="m"><b>配套：</b>FIX-9</span></div>
+
+    <div class="block"><span class="lbl">问题</span><code>PayoutResponse</code> 约定 <code>success=false</code> 表示「等待异步回调」，但提现监听器收到任何非异常、非 null 响应就直接 <code>payFinalize</code>（置成功、frozen→withdrawn、耗尽挂账），未检查 <code>isSuccess()</code> → 未来真实出款网关返回 pending 时「<b>账面已付、实际未付</b>」。</div>
+    <div class="block"><span class="lbl">根因</span>把「已受理待回调」误当「已终态成功」。</div>
+
+    <div class="evi">
+      <div class="h">证据 · 文件:行</div>
+      <ul>
+        <li>PayoutResponse.java:25-26（false=等回调约定）</li>
+        <li>SupplierWithdrawalServiceImpl.java:262（调 payout）、:274-275（无条件 payFinalize）</li>
+      </ul>
+    </div>
+
+    <div class="block"><span class="lbl">修复步骤</span></div>
+    <ol class="steps">
+      <li><code>payout</code> 返回后按 <code>resp.isSuccess()</code> 分流：<b>true → payFinalize</b>；<b>false → 保持 PAYING</b> 等异步回调/查单，由超时 Job 兜底。触碰 <span class="path">SupplierWithdrawalServiceImpl.java:262 / 274-275</span>。</li>
+    </ol>
+
+    <div class="block"><span class="lbl">验收</span>mock 出款返回 <code>success=false</code> → 提现单停 PAYING 不置成功；回调到达再终态。</div>
+    <div class="block win"><b>边界：</b>与 FIX-9（payout 接入）配套；出款上线<b>前必修</b>。</div>
+  </div>
+
+  <!-- FIX-5 -->
+  <div class="fix" id="fix-5" style="--nc:var(--fund)">
+    <div class="top"><h3><span class="id">FIX-5</span>提现监听器自调用 payFinalize，事务注解失效</h3><span class="badge">💰 一致性 · 新发现</span></div>
+    <div class="fixmeta"><span class="m"><b>触发：</b>出款/回调落库</span><span class="m"><b>取证：</b>Codex 新发现</span><span class="m"><b>家族：</b>AFTER_COMMIT 无重投</span></div>
+
+    <div class="block"><span class="lbl">问题</span>AFTER_COMMIT 监听器通过<b>同一个 Bean 自调用</b> <code>payFinalize</code>，其 <code>@Transactional</code> 不经 Spring AOP 代理 → 无事务边界；无 <code>REQUIRES_NEW</code>，外部 HTTP 成功后结果落库阶段异常时无提交保证。</div>
+    <div class="block"><span class="lbl">根因</span>Spring AOP 自调用限制 + AFTER_COMMIT 后无独立新事务。</div>
+
+    <div class="evi">
+      <div class="h">证据 · 文件:行</div>
+      <ul>
+        <li>SupplierWithdrawalServiceImpl.java:236 / 249 / 275 / 292（自调用链 + 事务假设）</li>
+      </ul>
+    </div>
+
+    <div class="block"><span class="lbl">修复步骤</span></div>
+    <ol class="steps">
+      <li>把 <code>payFinalize</code> / <code>payFail</code> 抽到独立 Bean 或经代理调用，并用 <code>@Transactional(REQUIRES_NEW)</code> 保证结果落库独立提交；配合持久化 outbox 语义。触碰 <span class="path">SupplierWithdrawalServiceImpl</span> 监听器与 finalize 方法。</li>
+    </ol>
+
+    <div class="block"><span class="lbl">验收</span>注入落库异常 → 事务确实回滚/重试，不出现「HTTP 成功但本地状态未落」。</div>
+    <div class="block win"><b>边界：</b>与 FIX-2 同属「AFTER_COMMIT 无重投」家族，可合并设计、分别提交。</div>
+  </div>
+
+  <!-- FIX-6 -->
+  <div class="fix" id="fix-6" style="--nc:var(--fund)">
+    <div class="top"><h3><span class="id">FIX-6</span>037 多账户 pending 与外部分账入账口径冲突</h3><span class="badge">💰 账账不一致 · 新发现</span></div>
+    <div class="fixmeta"><span class="m"><b>触发：</b>多账户 + 开真实分账</span><span class="m"><b>取证：</b>Codex 新发现</span><span class="m"><b>前置：</b>启用真实分账前必修</span></div>
+
+    <div class="block"><span class="lbl">问题</span>037 按每个 <code>platformAccountId</code> 分别加 pending；外部分账成功后却把全部 <code>platformAmount</code> 结算到 <code>PLATFORM_DEFAULT</code>，未按预分账明细 <code>settlePlatformPreDivision</code> 搬桶，且默认账户 UPDATE 不校验 pending 充足 → 非默认账户 pending <b>永久残留</b>、默认账户 pending 可能被<b>扣负</b>、与 037 明细账错配。</div>
+    <div class="block"><span class="lbl">根因</span>预分账（多账户）与正式分账入账（单默认账户）口径未对齐。</div>
+
+    <div class="evi">
+      <div class="h">证据 · 文件:行</div>
+      <ul>
+        <li>PaymentPreDivisionServiceImpl.java:194 / 204（按账户加 pending）</li>
+        <li>PaymentDivisionAccountingServiceImpl.java:48 / 50</li>
+        <li>SupplierBalanceServiceImpl.java:186 / 194</li>
+        <li>PlatformAccountMapper.java:105 / 112（只锁 PLATFORM_DEFAULT、不校验 pending）</li>
+      </ul>
+    </div>
+
+    <div class="block"><span class="lbl">修复步骤</span></div>
+    <ol class="steps">
+      <li>外部分账成功入账时按预分账明细<b>逐账户</b> <code>settlePlatformPreDivision</code>。</li>
+      <li>默认账户扣减加 pending <b>充足性校验/CAS</b>。触碰上述四处。</li>
+    </ol>
+
+    <div class="block"><span class="lbl">验收</span>多账户配置 + 外部分账 → 各平台账户 pending 归零、无负数、账账一致。</div>
+    <div class="block win"><b>边界：</b>仅在「037 多账户 + 外部分账」同时启用时触发；<b>启用真实分账前必修</b>。</div>
+  </div>
+
+  <!-- ============ 部署 ============ -->
+  <div class="grp g-deploy"><span class="pill">部署</span> <span class="sub">无代码风险，重发即解</span></div>
+
+  <!-- FIX-8 -->
+  <div class="fix" id="fix-8" style="--nc:var(--deploy)">
+    <div class="top"><h3><span class="id">FIX-8</span>通企付会员开户线上 404</h3><span class="badge">🚧 部署</span></div>
+    <div class="fixmeta"><span class="m"><b>触发：</b>当前线上</span><span class="m"><b>取证：</b>取证D</span><span class="m"><b>性质：</b>纯部署滞后，非代码缺陷</span></div>
+
+    <div class="block"><span class="lbl">问题</span><code>/admin-api/erp/supplier/tppay-member/*</code> 等接口在 <code>5b2502a4</code>（2026-07-20）<b>前后端 + 菜单同提交</b>引入；线上后端 jar 早于该 commit，请求落 <code>DefaultController</code> <code>/admin-api/erp/**</code> 兜底 → 返回 NOT_IMPLEMENTED（前端表现为报错）。</div>
+    <div class="block"><span class="lbl">根因</span>后端部署版本滞后于代码提交；非逻辑缺陷。</div>
+
+    <div class="evi">
+      <div class="h">证据 · 文件:行</div>
+      <ul>
+        <li>ErpSupplierController.java:116-151（tppay-member 端点）</li>
+        <li>DefaultController.java:43-47（erp 兜底）</li>
+        <li>git show --stat 5b2502a4（前后端 + 038_* seed 同提交）</li>
+      </ul>
+    </div>
+
+    <div class="block"><span class="lbl">修复步骤</span></div>
+    <ol class="steps">
+      <li>用当前 jar <b>重新部署后端</b>（走 Jenkins <code>yqh-deploy-prod</code>）即修复。</li>
+    </ol>
+
+    <div class="block"><span class="lbl">验收</span>线上会员注册弹窗不再报「ERP 模块已禁用」。</div>
+    <div class="block win"><b>待确认：</b>线上实际返回码（NOT_IMPLEMENTED 走 HTTP 200 带错误码，非纯 404，需抓包）。</div>
+  </div>
+
+  <!-- ============ 缺口 ============ -->
+  <div class="grp g-gap"><span class="pill">缺口</span> <span class="sub">非 bug，启用配套</span></div>
+
+  <!-- FIX-9 -->
+  <div class="fix" id="fix-9" style="--nc:var(--gap)">
+    <div class="top"><h3><span class="id">FIX-9</span>网关 stub cancelDivision / payout 待接入</h3><span class="badge">🧩 缺口</span></div>
+    <div class="fixmeta"><span class="m"><b>触发：</b>启用撤销/出款前</span><span class="m"><b>取证：</b>取证D</span><span class="m"><b>渠道：</b>固定 chanNo=yunst2yhzh</span></div>
+
+    <div class="block"><span class="lbl">问题</span><code>TppayPaymentChannelGateway</code> 的 <code>cancelDivision</code>(:132-136)、<code>payout</code>(:138-141) 抛 <code>PendingManualException</code>；<code>TppayClient</code> 无对应强类型方法（仅通用 <code>postRaw</code> :186）。</div>
+
+    <div class="block"><span class="lbl">应对接</span>通企付官方接口（文档证据）：</div>
+    <table class="mini">
+      <tr><th>stub</th><th>官方接口</th><th>路径</th><th>文档出处</th></tr>
+      <tr><td><code>payout</code> 出款</td><td>13. 提现</td><td><code>POST /pay/withdrawApply</code></td><td>018通企付SDK/…/17-13.提现.md:9-10；demo WithdrawApply.java:21；通知 18-14.提现结果通知.md</td></tr>
+      <tr><td><code>cancelDivision</code> 撤销</td><td>18. 分账撤销</td><td><code>POST /refund/refundAssureOrder</code></td><td>018/22-18.分账撤销接口.md:13-14；019/09-…md:1555-1625；通知 30-26.分账撤销结果通知.md</td></tr>
+      <tr><td><code>queryPool</code> 余额</td><td>12. 统一余额查询</td><td><code>POST /balance/query</code></td><td>018/16-12.统一余额查询.md:9-10</td></tr>
+    </table>
+
+    <div class="block"><span class="lbl">关键口径</span>本项目固定 <code>chanNo=yunst2yhzh</code>（TppayPaymentChannelGateway.java:58）。文档明确 <b>yunst2yhzh 分账后退款可直接走统一退款、撤销可延后</b>（018/22-18.md:11、019/08-…md:420）→ <code>cancelDivision</code> 对本渠道<b>低优先</b>；<code>payout</code>（自动出款）是提现闭环关键，属阶段四独立立项。</div>
+
+    <div class="block"><span class="lbl">修复步骤</span></div>
+    <ol class="steps">
+      <li><code>payout</code> 接 <code>/pay/withdrawApply</code>（yunst2yhzh 传 <code>chanNo/bizUserId</code>、<code>withdrawType</code>），配合 FIX-4 的 <code>success=false</code> 语义 + 提现结果通知回调落库。</li>
+      <li><code>cancelDivision</code> 视是否切 allinpay 再定。</li>
+    </ol>
+
+    <div class="block win"><b>待确认：</b><code>/pay/withdrawApply</code> 对 yunst2yhzh 的 <code>bizUserId</code> 来源、<code>bankCardNo</code>/<code>withdrawType</code> 取值、回调落地表，仓库文档未给完整映射（阶段四细化）。</div>
+  </div>
+
+  <!-- FIX-10 -->
+  <div class="fix" id="fix-10" style="--nc:var(--gap)">
+    <div class="top"><h3><span class="id">FIX-10</span>前端两工作台页 + 菜单 seed + fresh_db 037</h3><span class="badge">🧩 缺口</span></div>
+    <div class="fixmeta"><span class="m"><b>触发：</b>启用前</span><span class="m"><b>取证：</b>取证D</span><span class="m"><b>关联：</b>M1 / M2</span></div>
+
+    <div class="block"><span class="lbl">问题 / 证据</span></div>
+    <div class="evi">
+      <div class="h">证据 · 文件:行</div>
+      <ul>
+        <li><b>前端未建：</b>正式分账工作台（后端就绪 PaymentDivisionAdminController.java:29-56，端点 /yqh-balance/division/page|accounting-failed-page|retry-accounting）；通企付账户页（后端 SupplierTppayAccountController.java:29-56，仅 page/get/disable，<b>清单里的 /save-manual 端点后端不存在</b>）。样板 views/mall/yqh-platform/preDivision/ 已存在</li>
+        <li><b>菜单权限 seed 缺失：</b>sql/mysql/yqh_division_workbench_menu.sql 不存在；yqh-division:order:query 等 5 个权限串在 sql/ 内 0 命中（只在 Java @PreAuthorize）</li>
+        <li><b>fresh_db：</b>yqh_supply_chain_fresh_db.sql:55-56 工作区已加 SOURCE 037-platform-pre-division(.sql/-menu.sql) 但<b>未提交</b>（git diff 证实）</li>
+      </ul>
+    </div>
+
+    <div class="block"><span class="lbl">修复步骤</span></div>
+    <ol class="steps">
+      <li>照抄 <code>preDivision/</code> 样板建两页（对接实际端点）。</li>
+      <li>新建 <code>yqh_division_workbench_menu.sql</code> seed 5 权限串挂财务中心并 SOURCE 进 fresh 入口。</li>
+      <li>提交 fresh_db 037 改动。</li>
+    </ol>
+
+    <div class="block"><span class="lbl">验收</span>运营端能看分账台账/记账失败重试、能管理通企付账户；fresh 库一次建成含 037 表+菜单。</div>
+  </div>
+
+  <!-- ============ 附录 A ============ -->
+  <h2 class="sec" id="appendix">附录 A · FIX-1 代码级实现骨架<span class="sub">Codex 独立产出（resume session 019f88f9）· 行号基于 2026-07-22 基线，实施以实际代码为准</span></h2>
+
+  <div class="status" style="border-left-color:var(--bomb)">
+    <b>Codex 额外发现两点：</b>① <code>selectByIdempotencyKey</code> 的 <code>tenantId</code> 参数当前未参与查询条件（PaymentChannelTransactionMapper.java:31），应显式按租户查；② catch 后回查应走 <code>REQUIRES_NEW</code> 独立事务，避免外层事务读快照读不到并发已提交的插入。
+  </div>
+
+  <!-- A.1 -->
+  <h3 style="margin:22px 0 6px;font-size:15.5px;font-weight:800">A.1 · 号源方案一：Redis INCR（推荐）</h3>
+  <p class="block" style="margin-top:4px">新增 <code>service/channel/no/PaymentChannelNoGenerator.java</code> 接口（<code>nextNo()</code>，失败抛异常、<b>禁止返回 null</b>）+ <code>RedisPaymentChannelNoGenerator</code> 实现：</p>
+
+  <div class="codewrap">
+    <div class="ch"><span class="dot"></span>RedisPaymentChannelNoGenerator.java<span class="lang">Java</span></div>
+<pre class="code"><span class="k">@Component</span>
+<span class="k">@ConditionalOnProperty</span>(prefix = <span class="s">"yqh.balance.payment-channel-no"</span>, name = <span class="s">"strategy"</span>,
+        havingValue = <span class="s">"redis"</span>, matchIfMissing = true)
+public class RedisPaymentChannelNoGenerator implements PaymentChannelNoGenerator {
+    private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern(<span class="s">"yyyyMMddHHmmss"</span>);
+    private static final ZoneId ZONE = ZoneId.of(<span class="s">"Asia/Shanghai"</span>);
+    <span class="c">// INCR + PERSIST 作为单个 Lua 脚本原子执行；PERSIST 清除遗留 TTL</span>
+    private static final DefaultRedisScript&lt;Long&gt; NEXT = new DefaultRedisScript&lt;&gt;(
+        <span class="s">"local v = redis.call('INCR', KEYS[1]) redis.call('PERSIST', KEYS[1]) return v"</span>, Long.class);
+    private final StringRedisTemplate redis;
+    private final String key; <span class="c">// yqh:{env}:payment-channel-tx:no:global-seq</span>
+
+    public String nextNo() {
+        Long seq = redis.execute(NEXT, List.of(key));
+        if (seq == null || seq &lt;= 0) <span class="c">// 号源不可用直接失败，禁止降级回 AtomicLong</span>
+            throw exception(PAYMENT_CHANNEL_TRANSACTION_CREATE_FAILED, <span class="s">"REDIS_NO_GENERATOR"</span>, key);
+        <span class="c">// %019d 只补齐宽度、不取模，序号永不回绕</span>
+        return <span class="s">"PCT-"</span> + LocalDateTime.now(ZONE).format(FMT) + <span class="s">"-"</span>
+             + String.format(Locale.ROOT, <span class="s">"%019d"</span>, seq);
+    }
+}</pre>
+  </div>
+
+  <div class="codewrap">
+    <div class="ch"><span class="dot"></span>application-*.yaml<span class="lang">YAML</span></div>
+<pre class="code">yqh:
+  balance:
+    payment-channel-no:
+      strategy: redis
+      redis-key: yqh:${DEPLOY_ENV:local}:payment-channel-tx:no:global-seq</pre>
+  </div>
+
+  <ul class="clean">
+    <li><b>Key：</b>全租户全 pod 共用一个序列，<b>不得</b>在 key 加 pod ID（否则又变多个局部号源）。</li>
+    <li><b>TTL：</b>不设 TTL + Lua <code>PERSIST</code> 清残留；该 key 配<b>不可淘汰 + AOF + 主从/故障转移</b>。</li>
+    <li><b>并发正确性：</b>Redis 单 key 命令串行化，每次 <code>INCR</code> 得不同 seq；号里 seq <b>不取模</b> → 即使多 pod 同秒同前缀也不会撞完整号。</li>
+    <li><b>异常：</b>Redis 挂 → 抛业务异常由调用方回滚；DB <code>uk_tenant_no</code>（yqh_balance_r_alter.sql:195）+ 三次重试作最后防线。</li>
+  </ul>
+
+  <!-- A.2 -->
+  <h3 style="margin:22px 0 6px;font-size:15.5px;font-weight:800">A.2 · 号源方案二：雪花（备选）</h3>
+  <p class="block" style="margin-top:4px">新增 <code>SnowflakePaymentChannelNoGenerator</code>（<code>strategy=snowflake</code>）：<code>41 位时间戳 + 5 位 datacenterId + 5 位 workerId + 12 位序列</code>，<code>synchronized nextId()</code>，<b>时钟回拨抛异常关闭</b>，<code>worker-id/datacenter-id</code> 由 StatefulSet ordinal 显式注入（禁止随机/默认 0）。仅适合能可靠分配节点 ID + 监控时钟的部署。</p>
+
+  <!-- A.3 -->
+  <h3 style="margin:22px 0 6px;font-size:15.5px;font-weight:800">A.3 · 推荐结论</h3>
+  <div class="gate" style="background:linear-gradient(180deg,#f2f8fd,#fff);border-color:#cddff0;border-left-color:var(--flow)">
+    <b>Redis INCR。</b>仓库已由多租户 starter 间接引入 Redis（yudao-module-yqh-balance/pom.xml:75），单原子计数器、无需维护 worker ID、规避雪花的节点 ID 重复与时钟回拨风险。生产用<b>持久 key + AOF + 主从 + 禁淘汰</b>，保留 DB 唯一索引与三次重试兜底。
+  </div>
+
+  <!-- A.4 -->
+  <h3 style="margin:22px 0 6px;font-size:15.5px;font-weight:800">A.4 · 统一插入模板 <code style="font-size:14px">insertOrReuse</code></h3>
+  <p class="block" style="margin-top:4px">新增错误码 <code>PAYMENT_CHANNEL_TRANSACTION_CREATE_FAILED = 1_040_007_007</code>（ErrorCodeConstants.java）；<code>selectByIdempotencyKey</code> 改为显式带 <code>tenant_id</code>（<code>@TenantIgnore</code> + SQL 显式条件）；catch 回查走独立 <code>PaymentChannelTransactionLookupService</code>（<code>@Transactional(REQUIRES_NEW)</code>）。核心模板四步逻辑：</p>
+
+  <ol class="steps" style="--nc:var(--flow)">
+    <li><b>先查幂等键</b> — 命中 = 真幂等复用，直接返回 <code>created=false</code>。</li>
+    <li><b>insert</b> — 失败按 <code>no</code> 碰撞重试（初次 + 最多 3 次 = 最多 4 次 insert）。</li>
+    <li><b>新事务回查区分冲突来源</b> — <code>REQUIRES_NEW</code> 再查幂等键，命中 → 真幂等 <code>created=false</code>。</li>
+    <li><b>幂等键未命中 → 判定 no 碰撞</b> — 未超重试上限则重新 <code>generateNo</code> 重试，超限抛 <code>CREATE_FAILED</code>。</li>
+  </ol>
+
+  <div class="codewrap">
+    <div class="ch"><span class="dot"></span>PaymentChannelTransactionServiceImpl#insertOrReuse<span class="lang">Java</span></div>
+<pre class="code">private InsertOutcome insertOrReuse(String scene, Long tenantId, String key,
+        Supplier&lt;PaymentChannelTransactionDO&gt; factory) {
+    <span class="c">// 1) 先查幂等键：命中 = 真幂等复用</span>
+    PaymentChannelTransactionDO existing = mapper.selectByIdempotencyKey(tenantId, key);
+    if (existing != null) return new InsertOutcome(existing, false);
+    <span class="c">// 2) insert，失败按 no 碰撞重试（初次 + 最多 3 次 = 最多 4 次 insert）</span>
+    for (int retry = 0; ; retry++) {
+        PaymentChannelTransactionDO candidate = factory.get();
+        candidate.setNo(generateNo());
+        try {
+            mapper.insert(candidate);
+            return new InsertOutcome(candidate, true);
+        } catch (DuplicateKeyException ex) {
+            <span class="c">// 3) 新事务回查区分冲突来源（REQUIRES_NEW）</span>
+            existing = lookupService.selectByIdempotencyKey(tenantId, key);
+            if (existing != null) return new InsertOutcome(existing, false); <span class="c">// 真幂等</span>
+            <span class="c">// 4) 幂等键未命中 → 判定 no 碰撞</span>
+            if (retry &gt;= MAX_NO_COLLISION_RETRIES <span class="c">/*=3*/</span>)
+                throw exception(PAYMENT_CHANNEL_TRANSACTION_CREATE_FAILED, scene, key);
+            <span class="c">// 重新 generateNo 重试</span>
+        }
+    }
+}
+private String generateNo() { return paymentChannelNoGenerator.nextNo(); }</pre>
+  </div>
+
+  <div class="block win"><b>四入口复用 + beforeCollect 关键纠正：</b><code>beforePayout / beforeDivision / beforeRefund / beforeCollect</code> 全部复用该模板（各自 <code>factory</code> 填字段）。<code>beforeCollect</code> 当前（:166-168）对任意冲突 <code>return false</code>，改为返回 <code>outcome.created()</code> —— 真幂等重复 → false；仅 no 碰撞重试成功 → true，<b>不再把号碰撞误判为重复收款</b>。</div>
+
+  <!-- A.5 -->
+  <h3 style="margin:22px 0 6px;font-size:15.5px;font-weight:800">A.5 · 三处调用方判空兜底（事务回滚型）</h3>
+  <p class="block" style="margin-top:4px">各在解引用前判 null 抛可读业务异常，借外层 <code>@Transactional</code> 回滚：</p>
+  <ul class="clean">
+    <li><b>提现</b> SupplierWithdrawalServiceImpl.java:234（:237 <code>tx.getId()</code> 前）→ 回滚 status=4/payInitiateTime/channel 更新，提现单退回 status=1 可重试。</li>
+    <li><b>退款</b> SupplierWithdrawalApiImpl.java:200（:207 前）→ 回滚 recordAndApply 分录 + supplier balance 扣减。</li>
+    <li><b>分账</b> PaymentDivisionServiceImpl.java:121（:122 <code>buildDivideRequest</code> → :521 <code>tx.getNo()</code> 前）→ 回滚新建 divisionOrder，阻止 markProcessing 与事件发布。</li>
+  </ul>
+
+  <div class="codewrap">
+    <div class="ch"><span class="dot"></span>调用方判空统一范式<span class="lang">Java</span></div>
+<pre class="code">PaymentChannelTransactionDO tx = paymentChannelTransactionService.beforeXxx(...);
+if (tx == null) throw exception(PAYMENT_CHANNEL_TRANSACTION_CREATE_FAILED, <span class="s">"&lt;SCENE&gt;"</span>, idempotencyKey);
+<span class="c">// ...原解引用逻辑</span></pre>
+  </div>
+
+  <!-- A.6 -->
+  <h3 style="margin:22px 0 6px;font-size:15.5px;font-weight:800">A.6 · 失败用例清单（16）</h3>
+  <div class="casegrid">
+    <div class="case"><span class="n">01</span>Redis 多 pod 同秒 <b>1w 并发</b>无重复</div>
+    <div class="case"><span class="n">02</span>超 <b>10w</b> 序号不回绕</div>
+    <div class="case"><span class="n">03</span>key <code>TTL=-1</code>（PERSIST 生效）</div>
+    <div class="case"><span class="n">04</span>Redis 挂 → <b>抛异常不降级</b></div>
+    <div class="case"><span class="n">05</span>雪花多 pod 同毫秒唯一</div>
+    <div class="case"><span class="n">06</span>雪花单 pod <b>4096 序列</b>不溢出</div>
+    <div class="case"><span class="n">07</span>雪花<b>时钟回拨抛错</b></div>
+    <div class="case"><span class="n">08</span>雪花节点 ID 非法 → <b>启动失败</b></div>
+    <div class="case"><span class="n">09</span>号碰撞<b>重试成功</b></div>
+    <div class="case"><span class="n">10</span>号碰撞<b>三次耗尽抛错</b></div>
+    <div class="case"><span class="n">11</span>入口预查<b>真幂等短路</b></div>
+    <div class="case"><span class="n">12</span>并发 insert 真幂等<b>回查命中</b></div>
+    <div class="case"><span class="n">13</span><code>beforeCollect</code> 号碰撞返 <b>true</b> 不误判</div>
+    <div class="case"><span class="n">14</span><code>beforeCollect</code> 真幂等返 <b>false</b></div>
+    <div class="case"><span class="n">15</span>提现·退款·分账三处调用方<b>判空</b></div>
+    <div class="case"><span class="n">16</span>判空后<b>状态与分录回滚</b>、不发事件</div>
+  </div>
+
+  <!-- ============ 启用前置配置 ============ -->
+  <h2 class="sec" id="enable">启用真实分账的前置配置<span class="sub">仅隔离 UAT · 不在生产直接切开关</span></h2>
+
+  <div class="codewrap">
+    <div class="ch"><span class="dot"></span>application-uat.yaml（隔离测试）<span class="lang">YAML</span></div>
+<pre class="code">yqh:
+  balance:
+    payment-channel:
+      default-channel: TPPAY                 <span class="c"># 激活 TppayPaymentChannelGateway(:54)</span>
+      tppay:
+        pay-app-id: 1
+        pay-channel-code: tppay_api
+        division-notify-url: https://&lt;uat&gt;/admin-api/yqh-balance/tppay/division-notify
+    division:
+      external-division-enabled: true        <span class="c"># ConsignPayableDueJob(:43) 走 submitDueDivisionBatch</span></pre>
+  </div>
+
+  <ul class="clean">
+    <li><b>测试供应商 seed</b> <code>yqh_supplier_tppay_account</code>（有效 <code>biz_user_id</code>/<code>mem_no</code>/<code>chan_no=yunst2yhzh</code>），否则抛 <code>DIVISION_SUPPLIER_TPPAY_ACCOUNT_NOT_READY</code>。</li>
+    <li>确认 <code>pay_channel</code>(app_id=1, code=tppay_api) 有有效 <code>TppayPayClientConfig</code>。</li>
+    <li>查单/补偿 Job 需后台「<b>同步/修改保存</b>」注册 Quartz Trigger（裸 INSERT 不自动注册）。</li>
+    <li>提交 fresh_db 037 改动 + 新增菜单 seed（FIX-10）。</li>
+  </ul>
+
+  <!-- ============ 三波实施 ============ -->
+  <h2 class="sec" id="waves">实施顺序 · 三波编排<span class="sub">先止血 → 再补链 → 后启用</span></h2>
+  <div class="wave">
+    <div class="w">
+      <div class="lab">第一波 · 止血<span class="n">当前活雷</span></div>
+      <div class="chips">
+        <span class="chip l">FIX-1 流水号重号 NPE — 退款/提现路径现在就可能 NPE（独立提交带测试）</span>
+        <span class="chip l">FIX-7 T+N 少记/漏记 — 先 DB 核账是否已有历史漏记</span>
+        <span class="chip d">FIX-8 会员 404 — 重发后端即解（并行，无代码风险）</span>
+      </div>
+    </div>
+    <div class="w">
+      <div class="lab">第二波 · 补链<span class="n">启用前置带测试</span></div>
+      <div class="chips">
+        <span class="chip b">FIX-2 分账 outbox 兜底 ┐</span>
+        <span class="chip b">FIX-3 记账假失败自愈 ├ AFTER_COMMIT 家族 + 记账正确性</span>
+        <span class="chip f">FIX-5 提现事务失效 ┘</span>
+        <span class="chip f">FIX-6 037 多账户口径 — 多账户+分账账账一致</span>
+        <span class="chip g">FIX-10 前端两页+菜单+DB — 运营可视 / 可重试</span>
+      </div>
+    </div>
+    <div class="w">
+      <div class="lab">第三波 · 启用<span class="n">隔离 UAT gate</span></div>
+      <div class="chips">
+        <span class="chip f">FIX-4 提现 success 语义</span>
+        <span class="chip g">FIX-9 payout/cancel 接入（阶段四）</span>
+        <span class="chip d">配置前置(§启用) → 小额真实分账验收 → 六方核账一致 → 才谈生产灰度</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 验收 gate + 待确认 ============ -->
+  <h2 class="sec">验收 Gate · 待确认清单<span class="sub">对齐 20260719.md:90-96 M5</span></h2>
+  <div class="gate">
+    <b>验收 Gate：</b>UAT 小额真实分账回调 SUCCESS → 本地入账；回调重投/查单并发不重复入账；多 pod 无重号无 NPE；outbox 丢失进人工不无限查单；记账失败可重试自愈；目标单测 + <code>mvn -pl yudao-module-yqh-balance test</code> + 全量 package 通过。
+  </div>
+  <ul class="clean" style="margin-top:12px">
+    <li><b>待确认 ①</b> 线上部署 jar 实际 commit（坐实 FIX-8 = 部署滞后）。</li>
+    <li><b>待确认 ②</b> 通企付对「从未提交单」查询返回形态（FIX-2 落点）。</li>
+    <li><b>待确认 ③</b> <code>mchAssureOrderNo</code> 重提幂等 UAT 实测（FIX-2 自动 re-divide 前提）。</li>
+    <li><b>待确认 ④</b> T+N 历史是否已有漏记数据（FIX-7 补偿脚本）。</li>
+    <li><b>待确认 ⑤</b> <code>/pay/withdrawApply</code> 对 yunst2yhzh 的参数映射（FIX-9 阶段四）。</li>
+    <li><b>待确认 ⑥</b> 并发「假失败」时序窗口压测（FIX-3）。</li>
+  </ul>
+
+  <footer>
+    悦轻荷 · 支付后链路 · 详细修复方案（内部技术版）　|　多 Agent 协作产出：Claude 设计 · Codex 诊断实现 · Antigravity UI 设计/排版<br>
+    代码基线 <code style="font-family:var(--mono)">5b2502a4</code> @ main · 2026-07-22　|　取证来源：Claude 4 路只读走查（A 流水号 / B outbox / C 记账 / D 配置·stub·前端·部署）+ Codex 独立诊断（新增 FIX-4/5/6/7）<br>
+    行号来自只读取证，实施以实际代码为准 · 内部研判材料，请勿外传
+  </footer>
+
+</div>
+</body>
+</html>
