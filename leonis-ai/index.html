@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leonis AI · Codex 额度卡 代理价目表</title>
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #0b0f19;
+            --bg-card: rgba(18, 26, 44, 0.75);
+            --bg-card-hover: rgba(26, 37, 63, 0.85);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-glow: rgba(99, 102, 241, 0.35);
+            
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --secondary: #06b6d4;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-purple: #a855f7;
+            
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --text-dim: #64748b;
+            
+            --glass-bg: rgba(15, 23, 42, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --shadow-glow: 0 0 25px rgba(99, 102, 241, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 85% 45%, rgba(6, 182, 212, 0.1) 0%, transparent 45%),
+                radial-gradient(circle at 50% 85%, rgba(168, 85, 247, 0.08) 0%, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        /* Ambient Glow Objects */
+        .ambient-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            pointer-events: none;
+        }
+        .orb-1 { top: 5%; left: 10%; width: 350px; height: 350px; background: rgba(99, 102, 241, 0.15); }
+        .orb-2 { top: 40%; right: 5%; width: 450px; height: 450px; background: rgba(6, 182, 212, 0.12); }
+        .orb-3 { bottom: 10%; left: 30%; width: 400px; height: 400px; background: rgba(168, 85, 247, 0.1); }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 6rem;
+        }
+
+        /* Header / Hero */
+        header {
+            text-align: center;
+            padding: 3rem 1rem 2.5rem;
+            position: relative;
+        }
+
+        .brand-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(99, 102, 241, 0.12);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: var(--primary-light);
+            padding: 0.4rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            margin-bottom: 1.25rem;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
+        }
+
+        .brand-badge i {
+            color: #818cf8;
+            font-size: 0.8rem;
+        }
+
+        h1 {
+            font-size: clamp(2.2rem, 5vw, 3.5rem);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #ffffff 30%, #a5b4fc 70%, #38bdf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.75rem;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            max-width: 650px;
+            margin: 0 auto 2rem;
+            font-weight: 400;
+        }
+
+        .hero-tags {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .tag-pill {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-color);
+            padding: 0.45rem 1.1rem;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: all 0.3s ease;
+        }
+        .tag-pill i { color: var(--secondary); }
+        .tag-pill:hover {
+            border-color: rgba(99, 102, 241, 0.4);
+            background: rgba(99, 102, 241, 0.08);
+            transform: translateY(-2px);
+        }
+
+        /* Section Layout */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .section-title {
+            font-size: 1.45rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-main);
+        }
+
+        .section-title i {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(6, 182, 212, 0.2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-light);
+            font-size: 1.1rem;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+
+        /* Glass Card */
+        .glass-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 1.75rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .glass-card:hover {
+            border-color: var(--border-glow);
+            box-shadow: var(--shadow-glow);
+        }
+
+        /* Pricing Table Styling */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            text-align: left;
+        }
+
+        th {
+            background: rgba(15, 23, 42, 0.85);
+            padding: 1rem 1.25rem;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        td {
+            padding: 1.1rem 1.25rem;
+            font-size: 0.95rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            color: var(--text-main);
+            vertical-align: middle;
+            transition: background 0.2s ease;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: rgba(99, 102, 241, 0.04);
+        }
+
+        .card-type-name {
+            font-weight: 700;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-badge-1d {
+            background: rgba(6, 182, 212, 0.15);
+            color: #38bdf8;
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            padding: 0.15rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.78rem;
+        }
+        .card-badge-28d {
+            background: rgba(99, 102, 241, 0.15);
+            color: #a5b4fc;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            padding: 0.15rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.78rem;
+        }
+        .card-badge-30d {
+            background: rgba(168, 85, 247, 0.15);
+            color: #c084fc;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            padding: 0.15rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.78rem;
+        }
+
+        .price-original {
+            text-decoration: line-through;
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            margin-right: 0.4rem;
+        }
+
+        .price-agent {
+            color: var(--accent-green);
+            font-weight: 800;
+            font-size: 1.15rem;
+        }
+
+        .price-suggested {
+            color: #38bdf8;
+            font-weight: 700;
+            font-size: 1.05rem;
+        }
+
+        .profit-highlight {
+            background: rgba(16, 185, 129, 0.12);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            display: inline-block;
+        }
+
+        /* Filter Controls */
+        .filter-group {
+            display: flex;
+            gap: 0.5rem;
+            background: rgba(15, 23, 42, 0.6);
+            padding: 0.3rem;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .filter-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 0.4rem 0.9rem;
+            border-radius: 7px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .filter-btn.active, .filter-btn:hover {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 2px 10px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Interactive Profit Calculator */
+        .calc-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.75rem;
+        }
+        @media (max-width: 850px) {
+            .calc-wrapper { grid-template-columns: 1fr; }
+        }
+
+        .calc-inputs {
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 14px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+        .form-select, .form-input {
+            width: 100%;
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .form-select:focus, .form-input:focus {
+            border-color: var(--primary-light);
+        }
+
+        .calc-output {
+            background: linear-gradient(135deg, rgba(30, 27, 75, 0.7), rgba(15, 23, 42, 0.8));
+            border-radius: 14px;
+            padding: 1.5rem;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .calc-stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .calc-stat-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .calc-stat-val {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--accent-green);
+        }
+        .calc-stat-lbl {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-top: 0.25rem;
+        }
+
+        .example-box {
+            background: rgba(245, 158, 11, 0.08);
+            border-left: 3px solid var(--accent-amber);
+            padding: 1rem 1.25rem;
+            border-radius: 0 10px 10px 0;
+            margin-top: 1.25rem;
+            font-size: 0.875rem;
+            color: #fde68a;
+            line-height: 1.7;
+        }
+
+        /* Rules & Grid */
+        .rules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .rule-card {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.25rem;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+        .rule-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+        .rule-card h4 {
+            font-size: 1rem;
+            color: var(--primary-light);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .rule-card p {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+        }
+
+        /* Responsibility Table */
+        .resp-tag-us {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 0.2rem 0.6rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .resp-tag-you {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            padding: 0.2rem 0.6rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        /* Product Highlights & Models Cloud */
+        .selling-points {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 1.75rem;
+        }
+
+        .sp-card {
+            background: rgba(30, 41, 59, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+            padding: 1.25rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .sp-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 4px; height: 100%;
+            background: var(--primary);
+        }
+        .sp-card:nth-child(2)::before { background: var(--secondary); }
+        .sp-card:nth-child(3)::before { background: var(--accent-purple); }
+        .sp-card:nth-child(4)::before { background: var(--accent-green); }
+
+        .sp-card h4 {
+            font-size: 1rem;
+            margin-bottom: 0.4rem;
+            color: #fff;
+        }
+        .sp-card p {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        /* Tag Cloud for Models */
+        .tag-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .model-chip {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(99, 102, 241, 0.25);
+            color: #cbd5e1;
+            padding: 0.35rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-family: monospace;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .model-chip i { color: var(--primary-light); font-size: 0.75rem; }
+
+        .clients-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin-top: 0.75rem;
+        }
+        .client-badge {
+            background: rgba(6, 182, 212, 0.1);
+            border: 1px solid rgba(6, 182, 212, 0.25);
+            color: #38bdf8;
+            padding: 0.35rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* Mirror Site Banner */
+        .mirror-banner {
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(99, 102, 241, 0.15));
+            border: 1px solid rgba(6, 182, 212, 0.4);
+            border-radius: 16px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1.25rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .mirror-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .mirror-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: rgba(6, 182, 212, 0.2);
+            color: #38bdf8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            border: 1px solid rgba(6, 182, 212, 0.3);
+        }
+
+        .mirror-url {
+            font-family: monospace;
+            font-size: 1.1rem;
+            color: #67e8f9;
+            font-weight: 700;
+            background: rgba(15, 23, 42, 0.6);
+            padding: 0.3rem 0.8rem;
+            border-radius: 6px;
+            border: 1px dashed rgba(6, 182, 212, 0.4);
+        }
+
+        /* Buttons & Actions */
+        .btn-action {
+            background: linear-gradient(135deg, var(--primary), #4f46e5);
+            color: #fff;
+            border: none;
+            padding: 0.65rem 1.4rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+            text-decoration: none;
+        }
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+            background: linear-gradient(135deg, #6366f1, #4338ca);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            box-shadow: none;
+        }
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Floating Contact Widget & Footer */
+        .contact-card-hero {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 20px;
+            padding: 2.25rem;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+        }
+        .contact-card-hero::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, rgba(99, 102, 241, 0.08), transparent 70%);
+            pointer-events: none;
+        }
+
+        .contact-items {
+            display: flex;
+            justify-content: center;
+            gap: 1.75rem;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+
+        .contact-box {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 1.25rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            min-width: 260px;
+            transition: all 0.2s ease;
+        }
+        .contact-box:hover {
+            border-color: var(--primary-light);
+            transform: translateY(-3px);
+        }
+
+        .contact-icon-qq {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            background: rgba(14, 165, 233, 0.15);
+            color: #38bdf8;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem;
+        }
+        .contact-icon-wx {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            background: rgba(34, 197, 94, 0.15);
+            color: #4ade80;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .contact-detail {
+            text-align: left;
+        }
+        .contact-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+        .contact-val {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #10b981;
+            color: #fff;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            z-index: 9999;
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 4rem;
+            color: var(--text-dim);
+            font-size: 0.85rem;
+        }
+
+        /* Quick Config Snippet */
+        .code-block {
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1rem;
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: #38bdf8;
+            margin-top: 0.75rem;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2col { grid-template-columns: 1fr !important; }
+        }
+
+        @media (max-width: 640px) {
+            .container { padding: 1.25rem 0.75rem 4rem; }
+            .glass-card { padding: 1.25rem 1rem; }
+            th, td { padding: 0.75rem 0.6rem; font-size: 0.85rem; }
+            .calc-stat-grid { grid-template-columns: 1fr; }
+            .contact-items { flex-direction: column; }
+            .contact-box { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Ambient background lights -->
+    <div class="ambient-orb orb-1"></div>
+    <div class="ambient-orb orb-2"></div>
+    <div class="ambient-orb orb-3"></div>
+
+    <div class="container">
+        
+        <!-- Header -->
+        <header>
+            <div class="brand-badge">
+                <i class="fa-solid fa-bolt"></i> Leonis AI · Codex 额度卡
+            </div>
+            <h1>代理拿货与合作价目表</h1>
+            <p class="hero-subtitle">官方 1 倍率 · 真实用量无虚标 · 长期稳定供货 · 先款即时发码</p>
+            
+            <div class="hero-tags">
+                <div class="tag-pill"><i class="fa-solid fa-tags"></i> 代理统一 85 折拿货</div>
+                <div class="tag-pill"><i class="fa-solid fa-shield-halved"></i> 独立配额 / 掉线按比例补偿</div>
+                <div class="tag-pill"><i class="fa-solid fa-chart-line"></i> 建议售价最高达 48%+ 毛利</div>
+                <div class="tag-pill"><i class="fa-solid fa-globe"></i> 免配置网络直连镜像站</div>
+            </div>
+        </header>
+
+        <!-- Mirror Site Quick Alert -->
+        <div class="mirror-banner">
+            <div class="mirror-info">
+                <div class="mirror-icon">
+                    <i class="fa-solid fa-network-wired"></i>
+                </div>
+                <div>
+                    <h3 style="font-size: 1.1rem; color: #fff; margin-bottom: 0.2rem;">官方专属镜像直连站</h3>
+                    <p style="font-size: 0.875rem; color: var(--text-muted);">额外上线镜像站，支持任意网络直接访问使用，不需要配置各种网络即刻直连使用！</p>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                <span class="mirror-url">https://xchat.svtun.cn</span>
+                <button class="btn-action" onclick="copyToClipboard('https://xchat.svtun.cn', '镜像站网址已复制')">
+                    <i class="fa-regular fa-copy"></i> 复制网址
+                </button>
+                <a href="https://xchat.svtun.cn" target="_blank" class="btn-action btn-secondary">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> 打开镜像站
+                </a>
+            </div>
+        </div>
+
+        <!-- Section 1: Pricing Table -->
+        <div class="glass-card">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fa-solid fa-box-open"></i> 一、代理拿货价（85 折）
+                </div>
+                <div class="filter-group">
+                    <button class="filter-btn active" onclick="filterCards('all', this)">全部卡种</button>
+                    <button class="filter-btn" onclick="filterCards('1d', this)">1天卡</button>
+                    <button class="filter-btn" onclick="filterCards('28d', this)">28天卡</button>
+                    <button class="filter-btn" onclick="filterCards('30d', this)">30天卡</button>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>卡种类型</th>
+                            <th>总额度</th>
+                            <th>每日限额</th>
+                            <th>官方零售价</th>
+                            <th>你的代理拿货价 (85折)</th>
+                            <th>单张立省</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pricing-table-body">
+                        <!-- Table Rows populated via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Section 2: Recommended Retail Price & Calculator -->
+        <div class="glass-card">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fa-solid fa-calculator"></i> 二、建议售价与利润测算
+                </div>
+                <span style="font-size: 0.875rem; color: var(--accent-green); font-weight: 600;">
+                    <i class="fa-solid fa-circle-check"></i> 自主定价 · 利润上不封顶
+                </span>
+            </div>
+
+            <div class="calc-wrapper">
+                <!-- Inputs & Table -->
+                <div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 1rem; color: #fff;">建议零售参考表</h3>
+                    <div class="table-responsive" style="margin-bottom: 1.25rem;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>卡种</th>
+                                    <th>零售下限</th>
+                                    <th>建议零售价</th>
+                                    <th>零售上限</th>
+                                </tr>
+                            </thead>
+                            <tbody id="retail-table-body">
+                                <!-- Populated via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="example-box">
+                        <i class="fa-solid fa-lightbulb" style="color: var(--accent-amber); margin-right: 0.4rem;">
+                        </i><strong>实际收益举例（以28天 100刀卡为例）：</strong><br>
+                        拿货 ¥42 → 卖 <strong>¥60</strong> 赚 <strong>¥18</strong>（30%）<br>
+                        → 卖 <strong>¥70</strong> 赚 <strong>¥28</strong>（40%）<br>
+                        → 卖 <strong>¥80</strong> 赚 <strong>¥38</strong>（48%）
+                    </div>
+                </div>
+
+                <!-- Live Calculator Widget -->
+                <div class="calc-output">
+                    <div>
+                        <h3 style="font-size: 1.1rem; color: #fff; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fa-solid fa-sliders" style="color: var(--primary-light);"></i> 动态利润测算工具
+                        </h3>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">选择具体卡种并拖动售卖价格，实时计算你的纯利润与毛利率：</p>
+
+                        <div class="form-group">
+                            <label><i class="fa-regular fa-credit-card"></i> 选择卡种</label>
+                            <select id="calc-card-select" class="form-select" onchange="updateCalculator()">
+                                <!-- Options populated via JS -->
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <label style="margin:0;"><i class="fa-solid fa-yen-sign"></i> 拟设售卖价格</label>
+                                <span id="price-slider-val" style="color: var(--secondary); font-weight: 700;">¥60</span>
+                            </div>
+                            <input type="range" id="calc-price-slider" min="49.9" max="100" step="1" value="60" style="width: 100%; accent-color: var(--primary);" oninput="updateCalculator()">
+                        </div>
+                    </div>
+
+                    <div class="calc-stat-grid">
+                        <div class="calc-stat-card">
+                            <div class="calc-stat-lbl">代理成本</div>
+                            <div class="calc-stat-val" id="calc-cost-display" style="color: var(--text-muted); font-size: 1.3rem;">¥42</div>
+                        </div>
+                        <div class="calc-stat-card" style="border-color: rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.08);">
+                            <div class="calc-stat-lbl">每张纯利润</div>
+                            <div class="calc-stat-val" id="calc-profit-display">¥18</div>
+                        </div>
+                        <div class="calc-stat-card" style="grid-column: span 2; background: rgba(99, 102, 241, 0.1); border-color: rgba(99, 102, 241, 0.3);">
+                            <div class="calc-stat-lbl">估算毛利率</div>
+                            <div class="calc-stat-val" id="calc-margin-display" style="color: #a5b4fc; font-size: 1.8rem;">30.0%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: Rules & Responsibilities -->
+        <div class="glass-card">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fa-solid fa-handshake"></i> 三、合作规则与售后划定
+                </div>
+            </div>
+
+            <div class="rules-grid" style="margin-bottom: 1.75rem;">
+                <div class="rule-card">
+                    <h4><i class="fa-solid fa-gavel"></i> 零售价格规矩</h4>
+                    <p><strong>零售下限：</strong>不得低于表中价格，严禁恶性低价倾销。<br><strong>零售上限：</strong>不限，自主灵活定价。</p>
+                </div>
+                <div class="rule-card">
+                    <h4><i class="fa-solid fa-store"></i> 销售渠道</h4>
+                    <p>任意渠道均可！淘宝、闲鱼、微信朋友圈、小红书、私域社群或独立网站全无限制。</p>
+                </div>
+                <div class="rule-card">
+                    <h4><i class="fa-solid fa-wallet"></i> 结算方式</h4>
+                    <p>预付制（先款后码），不做账期。付款后享受 85 折代理价生成卡密。</p>
+                </div>
+                <div class="rule-card">
+                    <h4><i class="fa-solid fa-bolt-lightning"></i> 发货形式</h4>
+                    <p>打款后即时生成卡密，Excel / TXT 格式打包发送，批量拿货快速核对。</p>
+                </div>
+            </div>
+
+            <h3 style="font-size: 1.1rem; color: #fff; margin-bottom: 1rem;">售后责任划定</h3>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>售后情形</th>
+                            <th>由谁负责</th>
+                            <th>说明与处理方案</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="font-weight: 700;">卡密无效 / 重复</td>
+                            <td><span class="resp-tag-us"><i class="fa-solid fa-shield"></i> 我方负责</span></td>
+                            <td>我方承诺免费补发新卡密</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 700;">上游故障导致不可用</td>
+                            <td><span class="resp-tag-us"><i class="fa-solid fa-shield"></i> 我方负责</span></td>
+                            <td>若出现掉线等故障，按未消耗额度比例精准补偿退还</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 700;">终端客户配置指导</td>
+                            <td><span class="resp-tag-you"><i class="fa-solid fa-user-check"></i> 你（代理）</span></td>
+                            <td>我方提供完整 19 张图文教程供无水印转发</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 700;">终端客户用超额度想退</td>
+                            <td><span class="resp-tag-you"><i class="fa-solid fa-user-check"></i> 你（代理）</span></td>
+                            <td>客户使用超额度等个人原因退款由代理自理处理</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Section 4: Product Specs & Client Compatibility -->
+        <div class="glass-card">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fa-solid fa-microchip"></i> 四、产品说明 & 核心卖点
+                </div>
+            </div>
+
+            <div class="selling-points">
+                <div class="sp-card">
+                    <h4><i class="fa-solid fa-scale-balanced" style="color: var(--primary-light);"></i> 官方 1 倍率扣费</h4>
+                    <p>按实际调用扣除额度，无额外倍率，30 刀就是官方 30 刀的真实用量！</p>
+                </div>
+                <div class="sp-card">
+                    <h4><i class="fa-solid fa-eye" style="color: var(--secondary);"></i> 规则全透明</h4>
+                    <p>每一笔消耗在后台可查明细，输入 / 输出 / 缓存 Token 全部分项可见。</p>
+                </div>
+                <div class="sp-card">
+                    <h4><i class="fa-solid fa-key" style="color: var(--accent-purple);"></i> 独立配额机制</h4>
+                    <p>卡额度独立计算，不与账户余额混用，到期自动失效。</p>
+                </div>
+                <div class="sp-card">
+                    <h4><i class="fa-solid fa-server" style="color: var(--accent-green);"></i> 稳定号池保障</h4>
+                    <p>非日抛号，掉线期间未消耗额度按比例补偿！可作为自己号额度不够用的补充。</p>
+                </div>
+            </div>
+
+            <div class="grid-2col" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <!-- Supported Models -->
+                <div style="background: rgba(15, 23, 42, 0.5); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                    <h4 style="color: #fff; font-size: 1rem; margin-bottom: 0.5rem;"><i class="fa-solid fa-brain" style="color: var(--secondary);"></i> 支持的模型全家桶</h4>
+                    <div class="tag-cloud">
+                        <span class="model-chip"><i class="fa-solid fa-sparkles"></i> gpt-5.6-sol</span>
+                        <span class="model-chip"><i class="fa-solid fa-sparkles"></i> gpt-5.6</span>
+                        <span class="model-chip"><i class="fa-solid fa-sparkles"></i> gpt-5.6-terra</span>
+                        <span class="model-chip"><i class="fa-solid fa-sparkles"></i> gpt-5.6-luna</span>
+                        <span class="model-chip"><i class="fa-solid fa-sparkles"></i> gpt-5.5</span>
+                        <span class="model-chip"><i class="fa-solid fa-sparkles"></i> gpt-5.4</span>
+                        <span class="model-chip"><i class="fa-solid fa-sparkles"></i> gpt-5.4-mini</span>
+                        <span class="model-chip"><i class="fa-solid fa-sparkles"></i> gpt-5.3-codex-spark</span>
+                        <span class="model-chip"><i class="fa-solid fa-sparkles"></i> codex-auto-review</span>
+                        <span class="model-chip"><i class="fa-solid fa-sparkles"></i> gpt-5.2</span>
+                    </div>
+                </div>
+
+                <!-- Compatible Clients -->
+                <div style="background: rgba(15, 23, 42, 0.5); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                    <h4 style="color: #fff; font-size: 1rem; margin-bottom: 0.5rem;"><i class="fa-solid fa-laptop-code" style="color: var(--primary-light);"></i> 兼容客户端</h4>
+                    <div class="clients-grid">
+                        <span class="client-badge">Codex CLI</span>
+                        <span class="client-badge">Codex Desktop</span>
+                        <span class="client-badge">VS Code</span>
+                        <span class="client-badge">Cursor</span>
+                        <span class="client-badge">Cline</span>
+                        <span class="client-badge">Roo Code</span>
+                        <span class="client-badge">Cherry Studio</span>
+                        <span class="client-badge">ChatBox</span>
+                        <span class="client-badge">以及任何支持 OpenAI 协议的客户端</span>
+                    </div>
+
+                    <div class="code-block">
+                        <strong>配置方式：</strong> 改一个 base_url + 填 Key，两行搞定！
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expiry rules -->
+            <div style="margin-top: 1.25rem; background: rgba(99, 102, 241, 0.05); padding: 1rem 1.25rem; border-radius: 10px; border: 1px solid rgba(99, 102, 241, 0.2); font-size: 0.875rem; color: var(--text-muted);">
+                <strong style="color: var(--primary-light);"><i class="fa-solid fa-clock"></i> 有效期规则细节：</strong>
+                • 有效期从兑换之日起算，不是购买日<br>
+                • 卡密未兑换不会过期，可以先囤后卖<br>
+                • 到期后未使用额度作废
+            </div>
+        </div>
+
+        <!-- Section 5: Supporting Materials -->
+        <div class="glass-card">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fa-solid fa-folder-open"></i> 五、配套支持
+                </div>
+            </div>
+
+            <div class="rules-grid">
+                <div class="rule-card">
+                    <h4><i class="fa-solid fa-file-image" style="color: #38bdf8;"></i> 完整图文教程（19张实拍截图）</h4>
+                    <p>注册 → 兑换 → 创建密钥 → 客户端配置全流程，可直接转发给你的客户（Leonis AI兑换码使用说明）。</p>
+                </div>
+                <div class="rule-card">
+                    <h4><i class="fa-solid fa-book" style="color: #a855f7;"></i> 常见问题手册</h4>
+                    <p>8 条高频问题的标准答复，大幅降低客服沟通成本。</p>
+                </div>
+                <div class="rule-card">
+                    <h4><i class="fa-solid fa-headset" style="color: #10b981;"></i> 技术支持保障</h4>
+                    <p>配置类问题随时沟通，技术人员提供一对一答疑与全方位协助。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 6: Contact & Agent Onboarding -->
+        <div class="contact-card-hero">
+            <span class="brand-badge" style="margin-bottom: 0.75rem;">
+                <i class="fa-solid fa-paper-plane"></i> 代理加盟与卡密采购
+            </span>
+            <h2 style="font-size: 1.8rem; font-weight: 800; color: #fff; margin-bottom: 0.5rem;">联系我们代理开通</h2>
+            <p style="color: var(--text-muted); max-width: 500px; margin: 0 auto;">点击即可一键复制联系方式，欢迎沟通对接！</p>
+
+            <div class="contact-items">
+                <div class="contact-box" onclick="copyToClipboard('2279543256', 'QQ 号码已复制')" style="cursor: pointer;">
+                    <div class="contact-icon-qq">
+                        <i class="fa-brands fa-qq"></i>
+                    </div>
+                    <div class="contact-detail">
+                        <div class="contact-label">QQ 联系</div>
+                        <div class="contact-val">2279543256</div>
+                    </div>
+                    <i class="fa-regular fa-copy" style="margin-left: auto; color: var(--text-dim);"></i>
+                </div>
+
+                <div class="contact-box" onclick="copyToClipboard('lycorissso', '微信 ID 已复制')" style="cursor: pointer;">
+                    <div class="contact-icon-wx">
+                        <i class="fa-brands fa-weixin"></i>
+                    </div>
+                    <div class="contact-detail">
+                        <div class="contact-label">微信联系</div>
+                        <div class="contact-val">lycorissso</div>
+                    </div>
+                    <i class="fa-regular fa-copy" style="margin-left: auto; color: var(--text-dim);"></i>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>© Leonis AI · Codex 额度卡 代理价目表</p>
+            <p style="margin-top: 0.3rem;">官方 1 倍率 · 长期稳定供货 · 镜像直连</p>
+        </footer>
+
+    </div>
+
+    <!-- Copy Toast Notification -->
+    <div id="toast" class="toast">
+        <i class="fa-solid fa-circle-check"></i> <span id="toast-msg">复制成功</span>
+    </div>
+
+    <script>
+        // Data Store
+        const cardData = [
+            { id: 1, type: '1d', name: '1 天卡', quota: '30 刀', dailyLimit: '30 刀', retail: 15.9, agent: 14.0, suggest: 19.0, min: 15.9, max: '不限' },
+            { id: 2, type: '28d', name: '28 天卡', quota: '100 刀', dailyLimit: '不限', retail: 49.9, agent: 42.0, suggest: 60.0, min: 49.9, max: '不限' },
+            { id: 3, type: '28d', name: '28 天卡', quota: '300 刀', dailyLimit: '不限', retail: 149.0, agent: 127.0, suggest: 179.0, min: 149.0, max: '不限' },
+            { id: 4, type: '28d', name: '28 天卡', quota: '500 刀', dailyLimit: '不限', retail: 249.0, agent: 212.0, suggest: 299.0, min: 249.0, max: '不限' },
+            { id: 5, type: '28d', name: '28 天卡', quota: '1000 刀', dailyLimit: '不限', retail: 498.0, agent: 423.0, suggest: 598.0, min: 498.0, max: '不限' },
+            { id: 6, type: '30d', name: '30 天卡', quota: '600 刀', dailyLimit: '30 刀', retail: 298.0, agent: 253.0, suggest: 358.0, min: 298.0, max: '不限' },
+            { id: 7, type: '30d', name: '30 天卡', quota: '2000 刀', dailyLimit: '100 刀', retail: 998.0, agent: 848.0, suggest: 1198.0, min: 998.0, max: '不限' }
+        ];
+
+        // Render Tables
+        function renderTables(filter = 'all') {
+            const tableBody = document.getElementById('pricing-table-body');
+            const retailBody = document.getElementById('retail-table-body');
+            
+            tableBody.innerHTML = '';
+            retailBody.innerHTML = '';
+
+            const filtered = filter === 'all' ? cardData : cardData.filter(c => c.type === filter);
+
+            filtered.forEach(c => {
+                const save = (c.retail - c.agent).toFixed(1);
+                const badgeClass = c.type === '1d' ? 'card-badge-1d' : (c.type === '28d' ? 'card-badge-28d' : 'card-badge-30d');
+
+                // Row for Pricing Table
+                const tr1 = document.createElement('tr');
+                tr1.innerHTML = `
+                    <td>
+                        <div class="card-type-name">
+                            <span class="${badgeClass}">${c.name}</span>
+                        </div>
+                    </td>
+                    <td><strong style="color:#fff;">${c.quota}</strong></td>
+                    <td>${c.dailyLimit === '不限' ? '<span style="color:var(--accent-green);"><i class="fa-solid fa-infinity"></i> 不限</span>' : c.dailyLimit}</td>
+                    <td><span class="price-original">¥${c.retail}</span></td>
+                    <td><span class="price-agent">¥${c.agent}</span></td>
+                    <td><span class="profit-highlight">省 ¥${save}</span></td>
+                `;
+                tableBody.appendChild(tr1);
+
+                // Row for Suggested Retail Table
+                const tr2 = document.createElement('tr');
+                tr2.innerHTML = `
+                    <td style="font-weight:600;">${c.name} ${c.quota}</td>
+                    <td><span style="color:var(--text-muted)">¥${c.min}</span></td>
+                    <td><span class="price-suggested">¥${c.suggest}</span></td>
+                    <td><span style="color:var(--accent-purple); font-weight:600;">${c.max}</span></td>
+                `;
+                retailBody.appendChild(tr2);
+            });
+        }
+
+        // Filter handler
+        function filterCards(type, btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderTables(type);
+        }
+
+        // Setup Calculator Options
+        function initCalculator() {
+            const select = document.getElementById('calc-card-select');
+            select.innerHTML = '';
+            cardData.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.id;
+                opt.textContent = `${c.name} ${c.quota} (拿货 ¥${c.agent})`;
+                select.appendChild(opt);
+            });
+            // Select default 100刀 card (id: 2)
+            select.value = 2;
+            updateCalculator();
+        }
+
+        // Calculator Logic
+        function updateCalculator() {
+            const cardId = parseInt(document.getElementById('calc-card-select').value);
+            const card = cardData.find(c => c.id === cardId);
+            
+            const slider = document.getElementById('calc-price-slider');
+            
+            // Adjust slider range based on selected card
+            const minPrice = card.min;
+            const maxPrice = Math.round(card.agent * 2.2);
+            
+            // If card changed, sync slider min/max
+            if (slider.dataset.cardId != cardId) {
+                slider.min = minPrice;
+                slider.max = maxPrice;
+                slider.value = card.suggest;
+                slider.dataset.cardId = cardId;
+            }
+
+            const sellPrice = parseFloat(slider.value);
+            document.getElementById('price-slider-val').textContent = `¥${sellPrice}`;
+
+            const cost = card.agent;
+            const profit = (sellPrice - cost).toFixed(1);
+            const margin = ((profit / sellPrice) * 100).toFixed(1);
+
+            document.getElementById('calc-cost-display').textContent = `¥${cost}`;
+            document.getElementById('calc-profit-display').textContent = `¥${profit}`;
+            document.getElementById('calc-margin-display').textContent = `${margin}%`;
+        }
+
+        // Toast & Copy Utility
+        function copyToClipboard(text, msg) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast(msg);
+            }).catch(() => {
+                // Fallback
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                showToast(msg);
+            });
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            renderTables('all');
+            initCalculator();
+        });
+    </script>
+</body>
+</html>
